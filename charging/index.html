@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charging Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Orbitron', 'Inter', sans-serif; }
+        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4), 0 0 60px rgba(6, 182, 212, 0.2); }
+        .glow-green { box-shadow: 0 0 25px rgba(34, 197, 94, 0.4), 0 0 50px rgba(34, 197, 94, 0.2); }
+        .glow-blue { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 0 50px rgba(59, 130, 246, 0.2); }
+        .battery-fill {
+            animation: batteryFill 1200ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .energy-pulse {
+            animation: energyPulse 2000ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .grid-line {
+            animation: gridFlow 3000ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .charge-glow {
+            animation: chargeGlow 1500ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .power-flow {
+            animation: powerFlow 2500ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        @keyframes batteryFill {
+            0% { width: 32%; }
+            50% { width: 56%; }
+            100% { width: 32%; }
+        }
+        @keyframes energyPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        @keyframes gridFlow {
+            0% { stroke-dashoffset: 100; opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0.3; }
+        }
+        @keyframes chargeGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.6); }
+        }
+        @keyframes powerFlow {
+            0% { transform: translateX(-100%); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-black overflow-hidden">
+
+<main id="charging-mode-main" class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
+  
+  <!-- Main Cluster Container -->
+  <div id="cluster-display" class="relative w-[1400px] h-[600px] bg-gradient-to-b from-slate-900/90 to-black border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
+    
+    <!-- Ambient Background Glow -->
+    <div class="absolute inset-0 bg-gradient-radial from-green-500/8 via-transparent to-transparent pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-green-500/5 rounded-full blur-3xl pointer-events-none energy-pulse"></div>
+    
+    <!-- Top Status Bar -->
+    <div id="top-bar" class="absolute top-0 left-0 right-0 h-14 px-10 flex items-center justify-between bg-gradient-to-b from-slate-800/60 to-transparent backdrop-blur-sm z-30">
+      <div class="flex items-center gap-8 text-slate-400">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-clock text-sm"></i>
+          <span class="text-sm font-medium">14:32</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-temperature-half text-sm"></i>
+          <span class="text-sm font-medium">22°C</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full border border-green-500/40">
+          <i class="fa-solid fa-charging-station text-sm text-green-400"></i>
+          <span class="text-xs text-green-400 font-medium">CHARGING</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-6 text-slate-400">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-wifi text-sm"></i>
+          <span class="text-xs">5G</span>
+        </div>
+        <i class="fa-solid fa-signal text-sm"></i>
+        <div class="w-7 h-4 border border-slate-500 rounded-sm relative bg-slate-800/50">
+          <div class="absolute left-0.5 top-0.5 bottom-0.5 w-4/5 bg-green-400 rounded-sm"></div>
+          <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-2 bg-slate-500 rounded-r-sm"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-display" class="absolute inset-0 pt-14 pb-20 flex items-center justify-between px-20">
+      
+      <!-- Left Side - Power Flow Graphic -->
+      <div id="power-flow-section" class="flex flex-col items-center h-[450px] w-80">
+        <div class="relative w-full h-full bg-slate-900/60 rounded-3xl border border-slate-700/60 overflow-hidden backdrop-blur-sm">
+          
+          <!-- Power Flow Header -->
+          <div class="absolute top-4 left-4 right-4 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-cyan-400">
+              <i class="fa-solid fa-bolt text-lg"></i>
+              <span class="text-sm font-medium tracking-wide">POWER FLOW</span>
+            </div>
+            <div class="px-3 py-1 bg-green-500/20 rounded-full border border-green-500/40">
+              <span class="text-xs text-green-400">18.5 kW</span>
+            </div>
+          </div>
+          
+          <!-- Grid Connection -->
+          <div class="absolute top-20 left-8 flex flex-col items-center">
+            <div class="w-16 h-16 bg-slate-700/60 rounded-2xl border-2 border-cyan-400 flex items-center justify-center glow-cyan">
+              <i class="fa-solid fa-plug text-cyan-400 text-xl"></i>
+            </div>
+            <span class="text-xs text-cyan-400 mt-2 font-medium">GRID</span>
+          </div>
+          
+          <!-- Energy Flow Lines -->
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 320 450" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#22c55e;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.6" />
+              </linearGradient>
+            </defs>
+            
+            <!-- Grid to Car Flow -->
+            <path d="M 64 100 Q 160 150 256 200" 
+                  stroke="url(#flowGradient)" 
+                  stroke-width="4" 
+                  fill="none" 
+                  stroke-dasharray="20,10"
+                  class="grid-line"/>
+            
+            <!-- Car to Battery Flow -->
+            <path d="M 256 220 Q 200 280 144 340" 
+                  stroke="#22c55e" 
+                  stroke-width="4" 
+                  fill="none" 
+                  stroke-dasharray="15,8"
+                  class="grid-line" 
+                  style="animation-delay: 0.8s;"/>
+            
+            <!-- Energy Particles -->
+            <circle cx="120" cy="125" r="3" fill="#06b6d4" class="power-flow"/>
+            <circle cx="200" cy="180" r="3" fill="#22c55e" class="power-flow" style="animation-delay: 0.5s;"/>
+            <circle cx="180" cy="300" r="3" fill="#22c55e" class="power-flow" style="animation-delay: 1s;"/>
+          </svg>
+          
+          <!-- Car Icon -->
+          <div class="absolute top-44 right-16 flex flex-col items-center">
+            <div class="w-16 h-16 bg-slate-700/60 rounded-2xl border-2 border-green-400 flex items-center justify-center glow-green">
+              <i class="fa-solid fa-car text-green-400 text-xl"></i>
+            </div>
+            <span class="text-xs text-green-400 mt-2 font-medium">VEHICLE</span>
+          </div>
+          
+          <!-- Battery Icon -->
+          <div class="absolute bottom-20 left-16 flex flex-col items-center">
+            <div class="w-16 h-16 bg-slate-700/60 rounded-2xl border-2 border-green-400 flex items-center justify-center charge-glow">
+              <i class="fa-solid fa-battery-three-quarters text-green-400 text-xl"></i>
+            </div>
+            <span class="text-xs text-green-400 mt-2 font-medium">BATTERY</span>
+          </div>
+          
+          <!-- Power Stats -->
+          <div class="absolute bottom-8 left-4 right-4 flex items-center justify-between text-xs">
+            <div class="flex flex-col items-center text-cyan-400">
+              <span class="font-medium">Input</span>
+              <span>18.5 kW</span>
+            </div>
+            <div class="flex flex-col items-center text-green-400">
+              <span class="font-medium">Efficiency</span>
+              <span>94.2%</span>
+            </div>
+            <div class="flex flex-col items-center text-green-400">
+              <span class="font-medium">To Battery</span>
+              <span>17.4 kW</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center - Battery Display -->
+      <div id="battery-display" class="flex flex-col items-center justify-center">
+        <!-- Main Battery Icon with Fill Animation -->
+        <div class="relative mb-8">
+          <div class="w-48 h-32 border-4 border-slate-600 rounded-2xl bg-slate-900/80 relative overflow-hidden">
+            <!-- Battery Terminal -->
+            <div class="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-16 bg-slate-600 rounded-r-lg"></div>
+            
+            <!-- Battery Fill Level -->
+            <div class="absolute inset-2 bg-gradient-to-r from-green-400 to-green-500 rounded-xl battery-fill glow-green"></div>
+            
+            <!-- Battery Percentage -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-3xl font-bold text-white z-10">32%</span>
+            </div>
+            
+            <!-- Charging Animation Overlay -->
+            <div class="absolute inset-0 bg-green-400/20 rounded-xl energy-pulse"></div>
+          </div>
+          
+          <!-- Charging Icon -->
+          <div class="absolute -top-4 -right-4 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center glow-green">
+            <i class="fa-solid fa-bolt text-white text-xl"></i>
+          </div>
+        </div>
+        
+        <!-- Charge Progress Info -->
+        <div class="flex items-center gap-8 px-12 py-6 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md glow-green mb-8">
+          <div class="flex flex-col items-center">
+            <span class="text-sm text-slate-400 mb-1">CHARGING TO</span>
+            <span class="text-2xl text-white font-medium">80%</span>
+          </div>
+          
+          <div class="w-px h-12 bg-slate-600"></div>
+          
+          <div class="flex flex-col items-center">
+            <span class="text-sm text-slate-400 mb-1">TIME REMAINING</span>
+            <span class="text-2xl text-green-400 font-medium">1h 24m</span>
+          </div>
+          
+          <div class="w-px h-12 bg-slate-600"></div>
+          
+          <div class="flex flex-col items-center">
+            <span class="text-sm text-slate-400 mb-1">RANGE ADDED</span>
+            <span class="text-2xl text-cyan-400 font-medium">+156 km</span>
+          </div>
+        </div>
+        
+        <!-- Charging Rate -->
+        <div class="px-8 py-3 bg-slate-700/40 rounded-xl border border-green-500/50">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-tachometer-alt text-green-400"></i>
+            <span class="text-lg text-white font-medium">18.5 kW</span>
+            <span class="text-sm text-slate-400">• DC Fast Charge</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Range & Schedule Info -->
+      <div id="range-schedule" class="flex flex-col items-center h-[450px] w-80">
+        <div class="relative w-full h-full bg-slate-900/60 rounded-3xl border border-slate-700/60 overflow-hidden backdrop-blur-sm">
+          
+          <!-- Range Header -->
+          <div class="absolute top-4 left-4 right-4 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-cyan-400">
+              <i class="fa-solid fa-road text-lg"></i>
+              <span class="text-sm font-medium tracking-wide">RANGE STATUS</span>
+            </div>
+          </div>
+          
+          <!-- Current Range -->
+          <div class="absolute top-16 left-4 right-4 text-center">
+            <div class="text-4xl font-light text-white mb-2">278 km</div>
+            <div class="text-sm text-slate-400">Current Range</div>
+          </div>
+          
+          <!-- Range Progress Bar -->
+          <div class="absolute top-32 left-8 right-8">
+            <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-green-400 to-cyan-400 rounded-full" style="width: 32%;"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-xs text-slate-500">
+              <span>0 km</span>
+              <span>450 km</span>
+            </div>
+          </div>
+          
+          <!-- Target Range After Charging -->
+          <div class="absolute top-52 left-4 right-4 text-center">
+            <div class="text-3xl font-light text-green-400 mb-2">434 km</div>
+            <div class="text-sm text-slate-400">After 80% Charge</div>
+          </div>
+          
+          <!-- Schedule Info -->
+          <div class="absolute bottom-20 left-4 right-4">
+            <div class="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/60">
+              <div class="flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-calendar-clock text-cyan-400"></i>
+                <span class="text-sm text-cyan-400 font-medium">DEPARTURE SCHEDULE</span>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-clock text-lg text-white"></i>
+                  <span class="text-xl text-white font-medium">07:30</span>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm text-green-400">+24 km/hour</div>
+                  <div class="text-xs text-slate-400">Range Rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Energy Added Indicator -->
+          <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs">
+            <div class="flex flex-col items-center text-green-400">
+              <span class="font-medium">Added</span>
+              <span>12.4 kWh</span>
+            </div>
+            <div class="flex flex-col items-center text-cyan-400">
+              <span class="font-medium">Session</span>
+              <span>42 min</span>
+            </div>
+            <div class="flex flex-col items-center text-slate-400">
+              <span class="font-medium">Cost</span>
+              <span>€4.80</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Hint Bar -->
+    <div id="bottom-hint" class="absolute bottom-0 left-0 right-0 h-20 px-10 flex items-center justify-center bg-gradient-to-t from-slate-900/90 to-transparent backdrop-blur-md z-30">
+      <div class="flex items-center gap-6 px-8 py-4 bg-slate-800/60 rounded-2xl border border-cyan-500/40 backdrop-blur-md glow-cyan">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-car-side text-cyan-400 text-xl"></i>
+          <span class="text-lg text-white font-medium">Departure at 07:30</span>
+        </div>
+        
+        <div class="w-px h-8 bg-slate-600"></div>
+        
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-plus text-green-400"></i>
+          <span class="text-lg text-green-400 font-medium">24 km range/hour</span>
+        </div>
+        
+        <div class="w-px h-8 bg-slate-600"></div>
+        
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-leaf text-green-400"></i>
+          <span class="text-sm text-slate-400">100% Renewable Energy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</main>
+
+</body>
+</html>
