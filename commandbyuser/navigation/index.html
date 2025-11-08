@@ -1,102 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EV Navigation (Fixed)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
+<script>
   // Maneuvers queue with sensible progression
   const maneuvers = [
     { id:'exit-right', label:'Exit right', arrow:'right', dist:350 },
-    { id:'turn-left', label:'Turn left', arrow:'left', dist:1200 },
-    { id:'continue', label:'Continue', arrow:'up', dist:2800 }
+    { id:'turn-left',  label:'Turn left',  arrow:'left',  dist:1200 },
+    { id:'continue',   label:'Continue',   arrow:'up',    dist:2800 }
   ];
   let current = 0;
 
   // State
   let distanceM = maneuvers[0].dist;
-  let speedKmh = 78; // UI speed; we smooth and slow when close
+  let speedKmh = 78; // UI speed
 
   // Elements
-  const distEl = document.getElementById('distance');
-  const speedEl = document.getElementById('speed');
-  const nextExitEl = document.getElementById('next-exit');
-  const centerArrowEl = document.getElementById('center-arrow');
-  const laneArrowEl = document.getElementById('lane-arrow');
-  const laneLabelEl = document.getElementById('lane-label');
-  const leftSignal = document.getElementById('left-signal');
+  const distEl       = document.getElementById('distance');
+  const speedEl      = document.getElementById('speed');
+  const nextExitEl   = document.getElementById('next-exit');
+  const centerArrow  = document.getElementById('center-arrow');
+  const laneArrowEl  = document.getElementById('lane-arrow');
+  const laneLabelEl  = document.getElementById('lane-label');
 
-  function iconFor(arrow){
-    if(arrow==='right') return 'fa-arrow-right';
-    if(arrow==='left') return 'fa-arrow-left';
-    return 'fa-arrow-up';
-  }
+  const iconFor = dir => dir==='right' ? 'fa-arrow-right' :
+                         dir==='left'  ? 'fa-arrow-left'  : 'fa-arrow-up';
 
-  function renderCenter(){
-    // update central arrow to match current maneuver
-    centerArrowEl.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-7xl md:text-8xl text-cyan-400';
-    // lane indicator
+  function renderCenter() {
+    centerArrow.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-7xl md:text-8xl text-cyan-400';
     laneArrowEl.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-white text-lg';
-    laneLabelEl.textContent = maneuvers[current].arrow==='right' ? 'EXIT RIGHT' : maneuvers[current].arrow==='left' ? 'TURN LEFT' : 'STRAIGHT';
-    // flash only when turning
-    if(maneuvers[current].arrow!=='up'){
-      document.getElementById('lane-indicator').classList.add('flash');
-    } else {
-      document.getElementById('lane-indicator').classList.remove('flash');
-    }
+    laneLabelEl.textContent = maneuvers[current].arrow==='right' ? 'EXIT RIGHT'
+                           : maneuvers[current].arrow==='left'  ? 'TURN LEFT'
+                           : 'STRAIGHT';
   }
 
-  function renderUpcoming(){
-    // first item distance equals current central distance
-    nextExitEl.textContent = Math.max(1, Math.round(distanceM));
+  function renderUpcoming() {
+    nextExitEl.textContent = Math.max(1, Math.round(distanceM)); // never shows 0 unless we advance
   }
 
-  function advance(){
-    current = Math.min(current+1, maneuvers.length-1);
+  function advance() {
+    current = Math.min(current + 1, maneuvers.length - 1);
     distanceM = maneuvers[current].dist;
     renderCenter();
   }
 
-  // initial render
+  // Initial paint
   speedEl.textContent = speedKmh;
+  distEl.textContent  = Math.round(distanceM);
   renderCenter();
   renderUpcoming();
-  distEl.textContent = Math.round(distanceM);
 
-  // Countdown with UI pacing: slow when close to junction
-  let last = performance.now();
+  // Smooth countdown with slowdown near junction
+  let last = performance.now(), anim;
   function tick(now){
-    const dt = (now - last)/1000; last = now;
-    // simulate slowing near junction
-    const targetKmh = distanceM < 150 ? 42 : speedKmh;
-    const easedKmh = 0.9*Number(speedEl.textContent) + 0.1*targetKmh; // smooth
+    const dt = (now - last) / 1000; last = now;
+
+    const targetKmh = distanceM < 150 ? 42 : speedKmh;                    // slow near maneuver
+    const easedKmh  = 0.9 * Number(speedEl.textContent) + 0.1 * targetKmh; // smooth
     speedEl.textContent = Math.round(easedKmh);
 
-    // UI pacing factor so it doesn't burn down too fast
-    const mps = (easedKmh * 1000/3600) * 0.45; // 45% real speed for legibility
+    const mps = (easedKmh * 1000 / 3600) * 0.45; // 45% pacing for legibility
     distanceM = Math.max(0, distanceM - mps * dt);
 
-    // display
-    const shown = Math.max(0, Math.round(distanceM));
+    const shown = Math.round(distanceM);
     distEl.textContent = shown;
     renderUpcoming();
 
-    if (shown <= 0){
-      // small pop and move to next maneuver
+    if (shown <= 0) {
       distEl.style.transform = 'scale(1.12)';
-      setTimeout(()=>{ distEl.style.transform = 'scale(1)'; }, 160);
-      if(current < maneuvers.length-1){ advance(); }
-      else { cancelAnimationFrame(anim); return; }
+      setTimeout(() => { distEl.style.transform = 'scale(1)'; }, 160);
+      if (current < maneuvers.length - 1) advance();
+      else return; // finished
     }
     anim = requestAnimationFrame(tick);
   }
-  let anim = requestAnimationFrame(tick);
+  requestAnimationFrame(tick);
 
-  // Debug helpers
-  window.setSpeed = (kmh)=>{ speedKmh = Math.max(0, Number(kmh)||0); };
-  window.skip = ()=>{ distanceM = 0; };
+  // Console helpers (optional)
+  window.setSpeed = kmh => { speedKmh = Math.max(0, Number(kmh) || 0); };
+  window.resetDistance = m => { distanceM = Math.max(0, Number(m) || maneuvers[current].dist); };
 </script>
-
-</body>
-</html>
