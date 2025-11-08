@@ -99,20 +99,4 @@
 </script>
 
 </body>
-</html>){
-      // brief bounce effect
-      distEl.style.transform = 'scale(1.15)';
-      setTimeout(()=>{ distEl.style.transform = 'scale(1)'; }, 200);
-      return; // stop
-    }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-
-  // Optional: expose helpers for demo via console
-  window.setSpeed = (kmh)=>{ speedKmh = Math.max(0, Number(kmh)||0); speedEl.textContent = speedKmh; };
-  window.resetDistance = (m)=>{ distanceM = Math.max(0, Number(m)||350); };
-</script>
-
-</body>
 </html>
