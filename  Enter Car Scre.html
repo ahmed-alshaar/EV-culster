@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Orbitron', 'Inter', sans-serif; }
+        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4), 0 0 60px rgba(6, 182, 212, 0.2); }
+        .glow-blue { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 0 50px rgba(59, 130, 246, 0.2); }
+        .pulse-ring {
+            animation: pulseRing 3s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .fade-in-1 {
+            animation: fadeIn 1s cubic-bezier(0.4, 0.0, 0.2, 1) 0.5s both;
+        }
+        .fade-in-2 {
+            animation: fadeIn 1s cubic-bezier(0.4, 0.0, 0.2, 1) 1.5s both;
+        }
+        .fade-in-3 {
+            animation: fadeIn 1s cubic-bezier(0.4, 0.0, 0.2, 1) 2.5s both;
+        }
+        .fade-in-4 {
+            animation: fadeIn 1s cubic-bezier(0.4, 0.0, 0.2, 1) 3.5s both;
+        }
+        .light-pulse {
+            animation: lightPulse 3s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .arc-travel {
+            animation: arcTravel 3s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(0.8); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes lightPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        @keyframes arcTravel {
+            0% { stroke-dashoffset: 1000; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-black overflow-hidden">
+
+<main id="welcome-screen" class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center relative">
+  
+  <!-- Ambient Background Effects -->
+  <div class="absolute inset-0 bg-gradient-radial from-cyan-500/8 via-transparent to-transparent pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none light-pulse"></div>
+  
+  <!-- Main Welcome Container -->
+  <div id="welcome-container" class="relative w-[1400px] h-[600px] bg-gradient-to-b from-slate-900/40 to-black/60 border border-slate-800/60 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm">
+    
+    <!-- Outer Pulsing Ring -->
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-cyan-400/30 rounded-full pulse-ring"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-blue-400/40 rounded-full pulse-ring" style="animation-delay: 1s;"></div>
+    
+    <!-- Cluster Arc Background -->
+    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0" />
+          <stop offset="50%" style="stop-color:#06b6d4;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Main Cluster Arc -->
+      <path d="M 200 300 A 400 400 0 0 1 1200 300" 
+            stroke="url(#arcGradient)" 
+            stroke-width="3" 
+            fill="none" 
+            stroke-dasharray="20,10"
+            class="arc-travel"/>
+      
+      <!-- Inner Arc -->
+      <path d="M 250 320 A 350 350 0 0 1 1150 320" 
+            stroke="rgba(6, 182, 212, 0.3)" 
+            stroke-width="2" 
+            fill="none" 
+            stroke-dasharray="15,8"
+            class="arc-travel" 
+            style="animation-delay: 0.5s;"/>
+    </svg>
+    
+    <!-- Central Brand Halo -->
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-full glow-cyan">
+      <div class="absolute inset-4 bg-gradient-to-br from-cyan-500/30 to-blue-600/30 rounded-full glow-blue">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-3xl font-bold text-white tracking-widest">ARC</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Welcome Message -->
+    <div id="welcome-text" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-32 text-center fade-in-1">
+      <h1 class="text-4xl font-light text-white mb-2 tracking-wide">Hello, Alex</h1>
+      <p class="text-lg text-cyan-400 font-light tracking-wider">Welcome to ARC</p>
+    </div>
+    
+    <!-- System Status Icons -->
+    <div id="system-icons" class="absolute bottom-40 left-1/2 transform -translate-x-1/2 flex items-center gap-12">
+      
+      <!-- Battery System -->
+      <div class="flex flex-col items-center gap-3 fade-in-2">
+        <div class="w-16 h-16 bg-slate-800/60 rounded-2xl border border-slate-700/60 flex items-center justify-center glow-cyan backdrop-blur-sm">
+          <i class="fa-solid fa-battery-full text-2xl text-green-400"></i>
+        </div>
+        <span class="text-xs text-slate-400 font-medium tracking-wide">BATTERY</span>
+        <div class="w-2 h-2 bg-green-400 rounded-full glow-green"></div>
+      </div>
+      
+      <!-- Sensors -->
+      <div class="flex flex-col items-center gap-3 fade-in-2" style="animation-delay: 2s;">
+        <div class="w-16 h-16 bg-slate-800/60 rounded-2xl border border-slate-700/60 flex items-center justify-center glow-cyan backdrop-blur-sm">
+          <i class="fa-solid fa-radar text-2xl text-cyan-400"></i>
+        </div>
+        <span class="text-xs text-slate-400 font-medium tracking-wide">SENSORS</span>
+        <div class="w-2 h-2 bg-cyan-400 rounded-full glow-cyan"></div>
+      </div>
+      
+      <!-- Temperature -->
+      <div class="flex flex-col items-center gap-3 fade-in-2" style="animation-delay: 2.3s;">
+        <div class="w-16 h-16 bg-slate-800/60 rounded-2xl border border-slate-700/60 flex items-center justify-center glow-cyan backdrop-blur-sm">
+          <i class="fa-solid fa-temperature-half text-2xl text-blue-400"></i>
+        </div>
+        <span class="text-xs text-slate-400 font-medium tracking-wide">THERMAL</span>
+        <div class="w-2 h-2 bg-blue-400 rounded-full glow-blue"></div>
+      </div>
+      
+      <!-- Connectivity -->
+      <div class="flex flex-col items-center gap-3 fade-in-2" style="animation-delay: 2.6s;">
+        <div class="w-16 h-16 bg-slate-800/60 rounded-2xl border border-slate-700/60 flex items-center justify-center glow-cyan backdrop-blur-sm">
+          <i class="fa-solid fa-wifi text-2xl text-cyan-400"></i>
+        </div>
+        <span class="text-xs text-slate-400 font-medium tracking-wide">NETWORK</span>
+        <div class="w-2 h-2 bg-cyan-400 rounded-full glow-cyan"></div>
+      </div>
+      
+    </div>
+    
+    <!-- Ready Status -->
+    <div id="ready-status" class="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center fade-in-4">
+      <div class="px-8 py-4 bg-slate-800/50 rounded-2xl border border-green-500/40 backdrop-blur-md glow-green">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-check-circle text-green-400 text-xl"></i>
+          <span class="text-xl text-white font-medium tracking-wide">All Systems Ready</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Corner Accent Lights -->
+    <div class="absolute top-8 left-8 w-24 h-24 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute top-8 right-8 w-24 h-24 bg-gradient-to-bl from-blue-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute bottom-8 left-8 w-24 h-24 bg-gradient-to-tr from-cyan-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute bottom-8 right-8 w-24 h-24 bg-gradient-to-tl from-blue-400/20 to-transparent rounded-full blur-xl"></div>
+    
+    <!-- Edge Light Reflections -->
+    <div class="absolute top-0 left-1/4 right-1/4 h-1 bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent rounded-full"></div>
+    <div class="absolute bottom-0 left-1/4 right-1/4 h-1 bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent rounded-full"></div>
+    <div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent rounded-full"></div>
+    <div class="absolute right-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent rounded-full"></div>
+    
+  </div>
+  
+</main>
+
+</body>
+</html>
