@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Orbitron', 'Inter', sans-serif; }
+        .glow-green { box-shadow: 0 0 25px rgba(34, 197, 94, 0.4), 0 0 50px rgba(34, 197, 94, 0.2); }
+        .glow-cyan { box-shadow: 0 0 25px rgba(6, 182, 212, 0.4), 0 0 50px rgba(6, 182, 212, 0.2); }
+        .glow-red { box-shadow: 0 0 25px rgba(239, 68, 68, 0.4), 0 0 50px rgba(239, 68, 68, 0.2); }
+        .mode-transition {
+            transition: all 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .mode-active {
+            transform: scale(1.1);
+        }
+        .mode-inactive {
+            transform: scale(0.9);
+            opacity: 0.5;
+        }
+        .car-silhouette {
+            transition: all 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .title-crossfade {
+            transition: opacity 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .slide-animation {
+            transition: transform 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-black overflow-hidden">
+
+<main id="drive-mode-main" class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center relative">
+  
+  <!-- Ambient Background Effects -->
+  <div class="absolute inset-0 bg-gradient-radial from-cyan-500/8 via-transparent to-transparent pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+  
+  <!-- Main Drive Mode Overlay -->
+  <div id="drive-mode-overlay" class="relative w-[1400px] h-[600px] bg-gradient-to-b from-slate-900/40 to-black/60 border border-slate-800/60 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm">
+    
+    <!-- Safe Zone Container (80px padding) -->
+    <div class="absolute inset-0 p-20">
+      
+      <!-- Header Section -->
+      <div id="mode-header" class="flex items-center justify-between mb-16">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-slate-800/60 rounded-2xl border border-slate-700/60 flex items-center justify-center backdrop-blur-sm">
+            <i class="fa-solid fa-cog text-xl text-cyan-400"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-light text-white tracking-wide">Drive Mode</h1>
+            <p class="text-sm text-slate-400 tracking-wider">Select your preferred driving experience</p>
+          </div>
+        </div>
+        
+        <!-- Close Button -->
+        <button class="w-12 h-12 bg-slate-800/60 rounded-2xl border border-slate-700/60 flex items-center justify-center backdrop-blur-sm hover:bg-slate-700/60 transition-all">
+          <i class="fa-solid fa-times text-xl text-slate-400"></i>
+        </button>
+      </div>
+      
+      <!-- Main Content Area -->
+      <div class="flex items-center justify-between h-[350px]">
+        
+        <!-- Mode Selector List (Left) -->
+        <div id="mode-list" class="flex flex-col gap-6">
+          
+          <!-- ECO Mode -->
+          <div id="eco-mode" class="mode-option mode-inactive mode-transition cursor-pointer" onclick="selectMode('eco')">
+            <div class="flex items-center gap-6 p-6 bg-slate-800/40 rounded-2xl border border-slate-700/60 backdrop-blur-sm hover:bg-slate-700/40 w-80">
+              <div class="w-16 h-16 bg-gradient-to-br from-teal-500/20 to-green-500/20 rounded-2xl flex items-center justify-center border border-teal-500/30">
+                <i class="fa-solid fa-leaf text-2xl text-teal-400"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-medium text-white tracking-wide">ECO</h3>
+                <p class="text-sm text-slate-400 mt-1">Maximum efficiency & range</p>
+                <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                  <span>Power: Reduced</span>
+                  <span>Regen: High</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- NORMAL Mode (Active) -->
+          <div id="normal-mode" class="mode-option mode-active mode-transition cursor-pointer" onclick="selectMode('normal')">
+            <div class="flex items-center gap-6 p-6 bg-slate-700/60 rounded-2xl border-2 border-cyan-500/60 backdrop-blur-sm glow-cyan w-80">
+              <div class="w-16 h-16 bg-gradient-to-br from-cyan-500/30 to-blue-500/30 rounded-2xl flex items-center justify-center border border-cyan-500/50 glow-cyan">
+                <i class="fa-solid fa-balance-scale text-2xl text-cyan-400"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-medium text-white tracking-wide">NORMAL</h3>
+                <p class="text-sm text-cyan-400 mt-1">Balanced performance & comfort</p>
+                <div class="flex items-center gap-4 mt-2 text-xs text-slate-400">
+                  <span>Power: Balanced</span>
+                  <span>Regen: Medium</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SPORT Mode -->
+          <div id="sport-mode" class="mode-option mode-inactive mode-transition cursor-pointer" onclick="selectMode('sport')">
+            <div class="flex items-center gap-6 p-6 bg-slate-800/40 rounded-2xl border border-slate-700/60 backdrop-blur-sm hover:bg-slate-700/40 w-80">
+              <div class="w-16 h-16 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center border border-red-500/30">
+                <i class="fa-solid fa-bolt text-2xl text-red-400"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-medium text-white tracking-wide">SPORT</h3>
+                <p class="text-sm text-slate-400 mt-1">Maximum performance & response</p>
+                <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                  <span>Power: Maximum</span>
+                  <span>Regen: Low</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- 3D Car Silhouette (Center) -->
+        <div id="car-display" class="flex-1 flex items-center justify-center">
+          <div class="relative">
+            
+            <!-- Car Silhouette Container -->
+            <div id="car-silhouette" class="car-silhouette relative">
+              <svg width="280" height="140" viewBox="0 0 280 140" class="drop-shadow-2xl">
+                <defs>
+                  <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.8" />
+                    <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.6" />
+                  </linearGradient>
+                  <filter id="carGlow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge> 
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                
+                <!-- Car Body -->
+                <path d="M 40 80 L 60 60 L 80 50 L 200 50 L 220 60 L 240 80 L 240 100 L 220 110 L 60 110 L 40 100 Z" 
+                      fill="url(#carGradient)" 
+                      stroke="#06b6d4" 
+                      stroke-width="2" 
+                      filter="url(#carGlow)"/>
+                
+                <!-- Windows -->
+                <path d="M 70 60 L 85 52 L 195 52 L 210 60 L 200 65 L 80 65 Z" 
+                      fill="rgba(6, 182, 212, 0.3)" 
+                      stroke="#06b6d4" 
+                      stroke-width="1"/>
+                
+                <!-- Wheels -->
+                <circle cx="80" cy="105" r="12" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                <circle cx="200" cy="105" r="12" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                <circle cx="80" cy="105" r="6" fill="#06b6d4" opacity="0.8"/>
+                <circle cx="200" cy="105" r="6" fill="#06b6d4" opacity="0.8"/>
+                
+                <!-- Headlights -->
+                <circle cx="235" cy="75" r="4" fill="#ffffff" opacity="0.9"/>
+                <circle cx="235" cy="85" r="4" fill="#ffffff" opacity="0.9"/>
+                
+                <!-- Mode Lighting Effect -->
+                <circle id="mode-light" cx="140" cy="80" r="50" fill="rgba(6, 182, 212, 0.1)" opacity="0.8"/>
+              </svg>
+            </div>
+            
+            <!-- Ambient Light Rings -->
+            <div id="light-ring-1" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-cyan-400/20 rounded-full"></div>
+            <div id="light-ring-2" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-cyan-400/10 rounded-full"></div>
+            
+          </div>
+        </div>
+        
+        <!-- Mode Details (Right) -->
+        <div id="mode-details" class="w-80">
+          <div class="bg-slate-800/50 rounded-2xl border border-slate-700/60 p-8 backdrop-blur-sm">
+            
+            <!-- Current Mode Title -->
+            <div id="mode-title" class="title-crossfade mb-6">
+              <h2 class="text-3xl font-light text-cyan-400 tracking-wider">NORMAL</h2>
+              <p class="text-lg text-slate-300 mt-2">Balanced Performance</p>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="space-y-4">
+              
+              <!-- Power Output -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-400">Power Output</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div id="power-bar" class="h-full bg-cyan-400 rounded-full" style="width: 60%"></div>
+                  </div>
+                  <span id="power-value" class="text-sm text-white font-medium">60%</span>
+                </div>
+              </div>
+              
+              <!-- Regeneration -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-400">Regeneration</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div id="regen-bar" class="h-full bg-cyan-400 rounded-full" style="width: 50%"></div>
+                  </div>
+                  <span id="regen-value" class="text-sm text-white font-medium">50%</span>
+                </div>
+              </div>
+              
+              <!-- Response -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-400">Response</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div id="response-bar" class="h-full bg-cyan-400 rounded-full" style="width: 65%"></div>
+                  </div>
+                  <span id="response-value" class="text-sm text-white font-medium">65%</span>
+                </div>
+              </div>
+              
+              <!-- Efficiency -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-400">Efficiency</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div id="efficiency-bar" class="h-full bg-cyan-400 rounded-full" style="width: 70%"></div>
+                  </div>
+                  <span id="efficiency-value" class="text-sm text-white font-medium">70%</span>
+                </div>
+              </div>
+              
+            </div>
+            
+            <!-- Current Stats -->
+            <div class="mt-8 pt-6 border-t border-slate-700/60">
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex flex-col items-center">
+                  <span class="text-slate-400">Range</span>
+                  <span id="range-value" class="text-white font-medium">278 km</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <span class="text-slate-400">Efficiency</span>
+                  <span id="efficiency-display" class="text-white font-medium">14.2 kWh</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <span class="text-slate-400">0-100</span>
+                  <span id="acceleration-value" class="text-white font-medium">6.8s</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Bottom Action Bar -->
+      <div id="action-bar" class="flex items-center justify-between mt-16">
+        <div class="flex items-center gap-4 text-sm text-slate-400">
+          <i class="fa-solid fa-info-circle"></i>
+          <span>Changes take effect immediately</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <button class="px-8 py-3 bg-slate-700/60 rounded-xl border border-slate-600/60 text-white font-medium tracking-wide hover:bg-slate-600/60 transition-all">
+            Cancel
+          </button>
+          <button class="px-8 py-3 bg-cyan-500/80 rounded-xl border border-cyan-400/60 text-white font-medium tracking-wide glow-cyan hover:bg-cyan-400/80 transition-all">
+            Apply Mode
+          </button>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Corner Accent Lights -->
+    <div class="absolute top-8 left-8 w-24 h-24 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute top-8 right-8 w-24 h-24 bg-gradient-to-bl from-blue-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute bottom-8 left-8 w-24 h-24 bg-gradient-to-tr from-cyan-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute bottom-8 right-8 w-24 h-24 bg-gradient-to-tl from-blue-400/20 to-transparent rounded-full blur-xl"></div>
+    
+  </div>
+  
+</main>
+
+<script>
+window.addEventListener('load', function() {
+  
+  let currentMode = 'normal';
+  
+  const modeConfigs = {
+    eco: {
+      title: 'ECO',
+      subtitle: 'Maximum Efficiency',
+      color: 'teal',
+      power: 30,
+      regen: 90,
+      response: 40,
+      efficiency: 95,
+      range: '325 km',
+      efficiencyDisplay: '12.8 kWh',
+      acceleration: '8.2s',
+      lightColor: 'rgba(20, 184, 166, 0.15)'
+    },
+    normal: {
+      title: 'NORMAL',
+      subtitle: 'Balanced Performance',
+      color: 'cyan',
+      power: 60,
+      regen: 50,
+      response: 65,
+      efficiency: 70,
+      range: '278 km',
+      efficiencyDisplay: '14.2 kWh',
+      acceleration: '6.8s',
+      lightColor: 'rgba(6, 182, 212, 0.15)'
+    },
+    sport: {
+      title: 'SPORT',
+      subtitle: 'Maximum Performance',
+      color: 'red',
+      power: 100,
+      regen: 20,
+      response: 95,
+      efficiency: 45,
+      range: '210 km',
+      efficiencyDisplay: '18.7 kWh',
+      acceleration: '4.2s',
+      lightColor: 'rgba(239, 68, 68, 0.15)'
+    }
+  };
+  
+  function selectMode(mode) {
+    if (currentMode === mode) return;
+    
+    const config = modeConfigs[mode];
+    currentMode = mode;
+    
+    // Update mode selection visual states
+    document.querySelectorAll('.mode-option').forEach(el => {
+      el.classList.remove('mode-active');
+      el.classList.add('mode-inactive');
+    });
+    
+    const selectedMode = document.getElementById(`${mode}-mode`);
+    selectedMode.classList.remove('mode-inactive');
+    selectedMode.classList.add('mode-active');
+    
+    // Update car lighting
+    const modeLight = document.getElementById('mode-light');
+    modeLight.style.fill = config.lightColor;
+    
+    // Update car gradient colors
+    const carGradient = document.querySelector('#carGradient');
+    if (mode === 'eco') {
+      carGradient.innerHTML = `
+        <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:0.8" />
+        <stop offset="100%" style="stop-color:#059669;stop-opacity:0.6" />
+      `;
+    } else if (mode === 'sport') {
+      carGradient.innerHTML = `
+        <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.8" />
+        <stop offset="100%" style="stop-color:#dc2626;stop-opacity:0.6" />
+      `;
+    } else {
+      carGradient.innerHTML = `
+        <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.8" />
+        <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.6" />
+      `;
+    }
+    
+    // Crossfade title
+    const titleEl = document.getElementById('mode-title');
+    titleEl.style.opacity = '0';
+    
+    setTimeout(() => {
+      titleEl.innerHTML = `
+        <h2 class="text-3xl font-light text-${config.color}-400 tracking-wider">${config.title}</h2>
+        <p class="text-lg text-slate-300 mt-2">${config.subtitle}</p>
+      `;
+      titleEl.style.opacity = '1';
+    }, 150);
+    
+    // Animate performance bars
+    setTimeout(() => {
+      document.getElementById('power-bar').style.width = config.power + '%';
+      document.getElementById('power-value').textContent = config.power + '%';
+      
+      document.getElementById('regen-bar').style.width = config.regen + '%';
+      document.getElementById('regen-value').textContent = config.regen + '%';
+      
+      document.getElementById('response-bar').style.width = config.response + '%';
+      document.getElementById('response-value').textContent = config.response + '%';
+      
+      document.getElementById('efficiency-bar').style.width = config.efficiency + '%';
+      document.getElementById('efficiency-value').textContent = config.efficiency + '%';
+      
+      document.getElementById('range-value').textContent = config.range;
+      document.getElementById('efficiency-display').textContent = config.efficiencyDisplay;
+      document.getElementById('acceleration-value').textContent = config.acceleration;
+    }, 100);
+    
+    // Update bar colors
+    document.querySelectorAll('[id$="-bar"]').forEach(bar => {
+      bar.className = `h-full rounded-full bg-${config.color}-400`;
+    });
+  }
+  
+});
+</script>
+
+</body>
+</html>
