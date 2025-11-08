@@ -1,3 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EV Navigation (Fixed)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    ::-webkit-scrollbar{display:none}
+    body{font-family:'Orbitron','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    .glow-cyan{box-shadow:0 0 30px rgba(6,182,212,.35),0 0 60px rgba(6,182,212,.18)}
+    .glow-blue{box-shadow:0 0 25px rgba(59,130,246,.35),0 0 50px rgba(59,130,246,.18)}
+    .glow-amber{box-shadow:0 0 22px rgba(245,158,11,.45)}
+    .progress-fill{animation:progressFill 2.8s cubic-bezier(.4,0,.2,1) forwards}
+    .pulse-nav{animation:pulseNav 2s cubic-bezier(.4,0,.2,1) infinite}
+    .flash{animation:blink 1.1s steps(2,end) infinite}
+    @keyframes progressFill{from{width:0%}to{width:75%}}
+    @keyframes pulseNav{0%,100%{box-shadow:0 0 18px rgba(6,182,212,.35)}50%{box-shadow:0 0 40px rgba(6,182,212,.6)}}
+    @keyframes blink{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
+  </style>
+</head>
+<body class="bg-black overflow-hidden text-white">
+
+<main class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center relative">
+  <!-- Ambient BG -->
+  <div class="absolute inset-0 bg-gradient-radial from-cyan-500/8 via-transparent to-transparent pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Frame -->
+  <div class="relative w-[min(1400px,96vw)] h-[min(600px,85vh)] bg-gradient-to-b from-slate-900/40 to-black/60 border border-slate-800/60 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm">
+
+    <!-- ETA ribbon -->
+    <div class="absolute top-0 left-0 right-0 h-16 px-8 md:px-12 flex items-center justify-between bg-gradient-to-r from-slate-800/80 via-slate-700/60 to-slate-800/80 backdrop-blur-md z-30">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-3 text-cyan-400">
+          <i class="fa-solid fa-clock text-lg"></i>
+          <span class="text-lg md:text-xl font-medium tracking-wide">ETA 14:22</span>
+        </div>
+        <div class="hidden sm:block w-px h-8 bg-slate-600"></div>
+        <div class="hidden sm:flex items-center gap-3 text-green-400">
+          <i class="fa-solid fa-battery-three-quarters text-lg"></i>
+          <span class="text-lg md:text-xl font-medium">51%</span>
+        </div>
+      </div>
+      <div class="flex-1 mx-4 md:mx-8">
+        <div class="w-full h-2 bg-slate-800/60 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full progress-fill glow-cyan"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span class="text-sm">München</span>
+        <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
+        <span class="text-sm">42 km</span>
+      </div>
+    </div>
+
+    <!-- CENTRAL -->
+    <div class="absolute inset-0 pt-16 pb-24 flex items-center justify-center">
+      <div class="relative flex flex-col items-center">
+        <!-- Main round arrow -->
+        <div class="relative w-64 h-64 md:w-72 md:h-72 flex items-center justify-center mb-6">
+          <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 rounded-full blur-2xl"></div>
+          <div class="relative w-full h-full bg-slate-800/40 rounded-full border-4 border-cyan-400/60 flex items-center justify-center glow-cyan backdrop-blur-sm pulse-nav">
+            <i id="center-arrow" class="fa-solid fa-arrow-right text-7xl md:text-8xl text-cyan-400"></i>
+          </div>
+        </div>
+        <!-- Route pill (Munchen) -->
+        <div id="route-pill" class="mb-3 px-4 py-2 bg-slate-800/60 rounded-xl border border-slate-700/60 flex items-center gap-2">
+          <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center"><span class="text-sm font-bold text-black">A96</span></div>
+          <i class="fa-solid fa-arrow-right text-slate-400"></i>
+          <span class="text-base md:text-lg font-medium">München</span>
+        </div>
+        <!-- Distance countdown -->
+        <div class="text-center mb-4">
+          <div id="distance" class="text-5xl md:text-6xl font-light tracking-tight">350</div>
+          <div class="text-xl md:text-2xl text-slate-400 font-medium tracking-wide">meters</div>
+        </div>
+        <!-- Speed pill -->
+        <div class="mt-1">
+          <div class="flex items-center gap-4 px-6 py-3 bg-slate-900/60 rounded-xl border border-slate-700/40">
+            <span id="speed" class="text-2xl md:text-3xl text-slate-300 font-light">78</span>
+            <span class="text-base md:text-lg text-slate-500">km/h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Lane assist -->
+    <div class="absolute right-6 md:right-8 top-20 bottom-24 w-72 md:w-80">
+      <div class="relative w-full h-full bg-slate-900/60 rounded-3xl border border-slate-700/60 overflow-hidden backdrop-blur-sm">
+        <div class="absolute top-6 left-6 right-6 flex items-center justify-between">
+          <div class="flex items-center gap-3 text-cyan-400">
+            <i class="fa-solid fa-road text-lg"></i>
+            <span class="text-xs md:text-sm font-medium tracking-wide">LANE ASSIST</span>
+          </div>
+          <div class="px-3 py-1 bg-cyan-500/20 rounded-full border border-cyan-500/40">
+            <span class="text-[10px] md:text-xs text-cyan-400">ACTIVE</span>
+          </div>
+        </div>
+        <!-- Lane view -->
+        <svg class="absolute inset-0 w-full h-full mt-20" viewBox="0 0 280 400" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="laneGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+              <stop offset="50%" style="stop-color:#06b6d4;stop-opacity:0.85" />
+              <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+            </linearGradient>
+          </defs>
+          <path d="M 90 400 L 110 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue" />
+          <path d="M 170 400 L 150 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue" />
+          <path d="M 40 400 L 60 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none" />
+          <path d="M 220 400 L 200 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none" />
+          <path d="M 130 200 Q 70 150 40 120" stroke="#f59e0b" stroke-width="4" stroke-dasharray="15,8" fill="none" class="glow-amber" />
+        </svg>
+        <!-- Turn indicator in-lane (dynamic) -->
+        <div id="lane-indicator" class="absolute top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <div class="w-12 h-8 bg-amber-500 rounded-lg border-2 border-white flex items-center justify-center glow-amber flash">
+            <i id="lane-arrow" class="fa-solid fa-arrow-right text-white text-lg"></i>
+          </div>
+          <span id="lane-label" class="text-xs text-amber-400 font-medium">EXIT RIGHT</span>
+        </div>
+        <!-- Ego vehicle -->
+        <div class="absolute bottom-16 left-1/2 -translate-x-1/2 w-14 h-24 bg-gradient-to-t from-slate-600 to-slate-700 rounded-xl border-2 border-cyan-400/80 flex items-center justify-center glow-cyan">
+          <i class="fa-solid fa-car text-cyan-400 text-lg"></i>
+        </div>
+        <!-- Lane status -->
+        <div class="absolute bottom-8 left-6 right-6 flex justify-between text-[11px]">
+          <div class="flex items-center gap-2 text-green-400"><i class="fa-solid fa-check-circle"></i><span>Clear</span></div>
+          <div class="flex items-center gap-2 text-cyan-400"><i class="fa-solid fa-eye"></i><span>Tracking</span></div>
+          <div class="flex items-center gap-2 text-amber-400"><i class="fa-solid fa-exclamation-triangle"></i><span>Merge</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEFT: Power + upcoming -->
+    <div class="absolute left-6 md:left-8 top-20 bottom-24 w-64">
+      <!-- Battery -->
+      <div class="mb-6 p-6 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+        <div class="flex items-center gap-4 mb-4">
+          <i class="fa-solid fa-battery-three-quarters text-green-400 text-2xl"></i>
+          <div>
+            <div class="text-2xl font-medium">64%</div>
+            <div class="text-sm text-slate-400">278 km range</div>
+          </div>
+        </div>
+        <div class="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" style="width:64%"></div>
+        </div>
+        <div class="mt-3 flex justify-between text-xs text-slate-400">
+          <span>Arrival: 51%</span>
+          <span>Sufficient</span>
+        </div>
+      </div>
+      <!-- Upcoming -->
+      <div class="p-6 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+        <h3 class="text-sm text-cyan-400 font-medium tracking-wide mb-4">UPCOMING</h3>
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-arrow-right text-amber-400 text-xs"></i>
+            </div>
+            <div class="flex-1">
+              <div class="text-white text-sm">Exit right</div>
+              <div class="text-slate-400 text-xs"><span id="next-exit">350</span> m</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center" id="left-signal">
+              <i class="fa-solid fa-arrow-left text-cyan-400 text-xs"></i>
+            </div>
+            <div class="flex-1">
+              <div class="text-white text-sm">Turn left</div>
+              <div class="text-slate-400 text-xs">1.2 km</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-slate-600/40 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-arrow-up text-slate-400 text-xs"></i>
+            </div>
+            <div class="flex-1">
+              <div class="text-slate-300 text-sm">Continue</div>
+              <div class="text-slate-400 text-xs">2.8 km</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="absolute bottom-0 left-0 right-0 h-24 px-8 md:px-12 flex items-center justify-between bg-gradient-to-t from-slate-900/90 to-transparent backdrop-blur-md z-30">
+      <div class="flex items-center gap-6">
+        <button class="px-6 py-3 bg-slate-800/60 rounded-xl border border-slate-700/60 text-cyan-400 hover:bg-slate-700/60 transition-colors">
+          <i class="fa-solid fa-route text-lg mr-2"></i>
+          <span class="text-sm font-medium">REROUTE</span>
+        </button>
+        <button class="px-6 py-3 bg-slate-800/60 rounded-xl border border-slate-700/60 text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-volume-up text-lg mr-2"></i>
+          <span class="text-sm font-medium">MUTE</span>
+        </button>
+      </div>
+      <div class="hidden sm:flex items-center gap-8 text-sm">
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">REMAINING</span><span class="font-medium">42 km</span></div>
+        <div class="w-px h-8 bg-slate-700"></div>
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">TIME</span><span class="font-medium">28 min</span></div>
+        <div class="w-px h-8 bg-slate-700"></div>
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">EFFICIENCY</span><span class="text-green-400 font-medium">+2.1%</span></div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 text-cyan-400"><i class="fa-solid fa-satellite-dish text-lg"></i><span class="text-sm">GPS</span></div>
+        <div class="flex items-center gap-2 text-green-400"><i class="fa-solid fa-shield-halved text-lg"></i><span class="text-sm">AUTOPILOT</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
 <script>
   // Maneuvers queue with sensible progression
   const maneuvers = [
@@ -9,70 +227,75 @@
 
   // State
   let distanceM = maneuvers[0].dist;
-  let speedKmh = 78; // UI speed
+  let speedKmh = 78; // UI speed; slowed near junction for readability
 
   // Elements
-  const distEl       = document.getElementById('distance');
-  const speedEl      = document.getElementById('speed');
-  const nextExitEl   = document.getElementById('next-exit');
-  const centerArrow  = document.getElementById('center-arrow');
-  const laneArrowEl  = document.getElementById('lane-arrow');
-  const laneLabelEl  = document.getElementById('lane-label');
+  const distEl      = document.getElementById('distance');
+  const speedEl     = document.getElementById('speed');
+  const nextExitEl  = document.getElementById('next-exit');
+  const centerArrow = document.getElementById('center-arrow');
+  const laneArrowEl = document.getElementById('lane-arrow');
+  const laneLabelEl = document.getElementById('lane-label');
+  const leftSignal  = document.getElementById('left-signal');
 
-  const iconFor = dir => dir==='right' ? 'fa-arrow-right' :
-                         dir==='left'  ? 'fa-arrow-left'  : 'fa-arrow-up';
+  function iconFor(dir){ return dir==='right'?'fa-arrow-right':dir==='left'?'fa-arrow-left':'fa-arrow-up'; }
 
-  function renderCenter() {
+  function renderCenter(){
     centerArrow.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-7xl md:text-8xl text-cyan-400';
     laneArrowEl.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-white text-lg';
-    laneLabelEl.textContent = maneuvers[current].arrow==='right' ? 'EXIT RIGHT'
-                           : maneuvers[current].arrow==='left'  ? 'TURN LEFT'
-                           : 'STRAIGHT';
+    laneLabelEl.textContent = maneuvers[current].arrow==='right' ? 'EXIT RIGHT' : maneuvers[current].arrow==='left' ? 'TURN LEFT' : 'STRAIGHT';
+    // Flash indicator when turning
+    document.getElementById('lane-indicator').classList.toggle('flash', maneuvers[current].arrow!=='up');
+    // UPCOMING left tile flashing only when the upcoming is left
+    if(maneuvers[current].arrow==='left'){ leftSignal.classList.add('flash'); } else { leftSignal.classList.remove('flash'); }
   }
 
-  function renderUpcoming() {
-    nextExitEl.textContent = Math.max(1, Math.round(distanceM)); // never shows 0 unless we advance
+  function renderUpcoming(){
+    // first item mirrors current distance
+    nextExitEl.textContent = Math.max(1, Math.round(distanceM));
   }
 
-  function advance() {
-    current = Math.min(current + 1, maneuvers.length - 1);
+  function advance(){
+    current = Math.min(current+1, maneuvers.length-1);
     distanceM = maneuvers[current].dist;
     renderCenter();
   }
 
-  // Initial paint
+  // Initial render
   speedEl.textContent = speedKmh;
   distEl.textContent  = Math.round(distanceM);
   renderCenter();
   renderUpcoming();
 
-  // Smooth countdown with slowdown near junction
+  // Countdown with UI pacing: slow when close to junction
   let last = performance.now(), anim;
   function tick(now){
-    const dt = (now - last) / 1000; last = now;
-
-    const targetKmh = distanceM < 150 ? 42 : speedKmh;                    // slow near maneuver
-    const easedKmh  = 0.9 * Number(speedEl.textContent) + 0.1 * targetKmh; // smooth
+    const dt = (now - last)/1000; last = now;
+    const targetKmh = distanceM < 150 ? 42 : speedKmh;
+    const easedKmh  = 0.9*Number(speedEl.textContent) + 0.1*targetKmh; // smooth
     speedEl.textContent = Math.round(easedKmh);
 
-    const mps = (easedKmh * 1000 / 3600) * 0.45; // 45% pacing for legibility
+    const mps = (easedKmh * 1000/3600) * 0.45; // 45% of real speed for legibility
     distanceM = Math.max(0, distanceM - mps * dt);
 
-    const shown = Math.round(distanceM);
+    const shown = Math.max(0, Math.round(distanceM));
     distEl.textContent = shown;
     renderUpcoming();
 
-    if (shown <= 0) {
+    if (shown <= 0){
       distEl.style.transform = 'scale(1.12)';
-      setTimeout(() => { distEl.style.transform = 'scale(1)'; }, 160);
-      if (current < maneuvers.length - 1) advance();
-      else return; // finished
+      setTimeout(()=>{ distEl.style.transform = 'scale(1)'; }, 160);
+      if(current < maneuvers.length-1){ advance(); }
+      else { cancelAnimationFrame(anim); return; }
     }
     anim = requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+  anim = requestAnimationFrame(tick);
 
   // Console helpers (optional)
-  window.setSpeed = kmh => { speedKmh = Math.max(0, Number(kmh) || 0); };
-  window.resetDistance = m => { distanceM = Math.max(0, Number(m) || maneuvers[current].dist); };
+  window.setSpeed = (kmh)=>{ speedKmh = Math.max(0, Number(kmh)||0); };
+  window.resetDistance = (m)=>{ distanceM = Math.max(0, Number(m)||maneuvers[current].dist); };
 </script>
+
+</body>
+</html>
