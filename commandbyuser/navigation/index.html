@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EV Navigation (Right Exit • Tuned)</title>
+  <title>EV Navigation (Clean)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -66,11 +66,10 @@
           <div class="relative w-full h-full bg-slate-800/40 rounded-full border-4 border-cyan-400/60 flex items-center justify-center glow-cyan backdrop-blur-sm pulse-nav">
             <i id="center-arrow" class="fa-solid fa-arrow-right text-6xl md:text-7xl text-cyan-400"></i>
           </div>
-          <!-- subtle fork background to make the right turn obvious, with faint left road -->
+          <!-- Clean circle guidance: only the RIGHT dashed path -->
           <svg class="absolute inset-0" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d="M50 100 L50 40" stroke="#334155" stroke-width="2" fill="none" />
+            <path d="M50 100 L50 40" stroke="#33415500" stroke-width="0" fill="none" />
             <path d="M50 40 Q75 30 92 20" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4,3" fill="none" />
-            <path d="M50 40 Q25 30 8 20" stroke="#334155" stroke-width="2" fill="none" opacity="0.6" />
           </svg>
         </div>
         <!-- Route pill (Munchen) -->
@@ -79,7 +78,7 @@
           <i class="fa-solid fa-arrow-right text-slate-400"></i>
           <span class="text-base md:text-lg font-medium">München</span>
         </div>
-        <!-- Speed pill (moved up for visibility) -->
+        <!-- Speed pill (visible up top) -->
         <div class="mb-3">
           <div class="flex items-center gap-3 px-5 py-2.5 bg-slate-900/70 rounded-xl border border-slate-700/40">
             <span id="speed" class="text-2xl md:text-3xl text-white font-medium">78</span>
@@ -106,7 +105,7 @@
             <span class="text-[10px] md:text-xs text-cyan-400">ACTIVE</span>
           </div>
         </div>
-        <!-- Lane view -->
+        <!-- Lane view (grey lines removed) -->
         <svg class="absolute inset-0 w-full h-full mt-20" viewBox="0 0 280 400" preserveAspectRatio="none">
           <defs>
             <linearGradient id="laneGlow" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -115,16 +114,11 @@
               <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
             </linearGradient>
           </defs>
-          <!-- center lane (ensure car centered between these) -->
+          <!-- Keep only the center lane pair -->
           <path d="M 90 400 L 110 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue" />
           <path d="M 170 400 L 150 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue" />
-          <!-- adjacent lanes -->
-          <path d="M 40 400 L 60 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none" />
-          <path d="M 220 400 L 200 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none" />
-          <!-- guidance dashed path going RIGHT -->
+          <!-- Guidance dashed path going RIGHT -->
           <path d="M 130 220 Q 200 170 240 140" stroke="#f59e0b" stroke-width="4" stroke-dasharray="15,8" fill="none" class="glow-amber" />
-          <!-- show LEFT road option faintly to make the choice obvious -->
-          <path d="M 130 220 Q 60 170 30 140" stroke="#334155" stroke-width="3" fill="none" opacity="0.5" />
         </svg>
         <!-- Turn indicator in-lane (RIGHT) -->
         <div id="lane-indicator" class="absolute top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
@@ -228,7 +222,7 @@
 </main>
 
 <script>
-  // Maneuvers (keep to right exit for this version)
+  // Maneuvers queue (kept for demo pacing)
   const maneuvers = [
     { id:'exit-right', label:'Exit right', arrow:'right', dist:350 },
     { id:'turn-left',  label:'Turn left',  arrow:'left',  dist:1200 },
