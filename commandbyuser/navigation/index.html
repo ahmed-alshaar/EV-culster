@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EV Navigation (Fixed)</title>
+  <title>EV Navigation (Right Exit • Tuned)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -60,30 +60,36 @@
     <!-- CENTRAL -->
     <div class="absolute inset-0 pt-16 pb-24 flex items-center justify-center">
       <div class="relative flex flex-col items-center">
-        <!-- Main round arrow -->
-        <div class="relative w-64 h-64 md:w-72 md:h-72 flex items-center justify-center mb-6">
+        <!-- Smaller round arrow -->
+        <div class="relative w-52 h-52 md:w-56 md:h-56 flex items-center justify-center mb-4">
           <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 rounded-full blur-2xl"></div>
           <div class="relative w-full h-full bg-slate-800/40 rounded-full border-4 border-cyan-400/60 flex items-center justify-center glow-cyan backdrop-blur-sm pulse-nav">
-            <i id="center-arrow" class="fa-solid fa-arrow-right text-7xl md:text-8xl text-cyan-400"></i>
+            <i id="center-arrow" class="fa-solid fa-arrow-right text-6xl md:text-7xl text-cyan-400"></i>
           </div>
+          <!-- subtle fork background to make the right turn obvious, with faint left road -->
+          <svg class="absolute inset-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M50 100 L50 40" stroke="#334155" stroke-width="2" fill="none" />
+            <path d="M50 40 Q75 30 92 20" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4,3" fill="none" />
+            <path d="M50 40 Q25 30 8 20" stroke="#334155" stroke-width="2" fill="none" opacity="0.6" />
+          </svg>
         </div>
         <!-- Route pill (Munchen) -->
-        <div id="route-pill" class="mb-3 px-4 py-2 bg-slate-800/60 rounded-xl border border-slate-700/60 flex items-center gap-2">
+        <div id="route-pill" class="mb-2 px-4 py-2 bg-slate-800/60 rounded-xl border border-slate-700/60 flex items-center gap-2">
           <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center"><span class="text-sm font-bold text-black">A96</span></div>
           <i class="fa-solid fa-arrow-right text-slate-400"></i>
           <span class="text-base md:text-lg font-medium">München</span>
         </div>
+        <!-- Speed pill (moved up for visibility) -->
+        <div class="mb-3">
+          <div class="flex items-center gap-3 px-5 py-2.5 bg-slate-900/70 rounded-xl border border-slate-700/40">
+            <span id="speed" class="text-2xl md:text-3xl text-white font-medium">78</span>
+            <span class="text-base md:text-lg text-slate-400">km/h</span>
+          </div>
+        </div>
         <!-- Distance countdown -->
-        <div class="text-center mb-4">
+        <div class="text-center mb-2">
           <div id="distance" class="text-5xl md:text-6xl font-light tracking-tight">350</div>
           <div class="text-xl md:text-2xl text-slate-400 font-medium tracking-wide">meters</div>
-        </div>
-        <!-- Speed pill -->
-        <div class="mt-1">
-          <div class="flex items-center gap-4 px-6 py-3 bg-slate-900/60 rounded-xl border border-slate-700/40">
-            <span id="speed" class="text-2xl md:text-3xl text-slate-300 font-light">78</span>
-            <span class="text-base md:text-lg text-slate-500">km/h</span>
-          </div>
         </div>
       </div>
     </div>
@@ -109,20 +115,25 @@
               <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
             </linearGradient>
           </defs>
+          <!-- center lane (ensure car centered between these) -->
           <path d="M 90 400 L 110 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue" />
           <path d="M 170 400 L 150 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue" />
+          <!-- adjacent lanes -->
           <path d="M 40 400 L 60 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none" />
           <path d="M 220 400 L 200 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none" />
-          <path d="M 130 200 Q 70 150 40 120" stroke="#f59e0b" stroke-width="4" stroke-dasharray="15,8" fill="none" class="glow-amber" />
+          <!-- guidance dashed path going RIGHT -->
+          <path d="M 130 220 Q 200 170 240 140" stroke="#f59e0b" stroke-width="4" stroke-dasharray="15,8" fill="none" class="glow-amber" />
+          <!-- show LEFT road option faintly to make the choice obvious -->
+          <path d="M 130 220 Q 60 170 30 140" stroke="#334155" stroke-width="3" fill="none" opacity="0.5" />
         </svg>
-        <!-- Turn indicator in-lane (dynamic) -->
+        <!-- Turn indicator in-lane (RIGHT) -->
         <div id="lane-indicator" class="absolute top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
           <div class="w-12 h-8 bg-amber-500 rounded-lg border-2 border-white flex items-center justify-center glow-amber flash">
             <i id="lane-arrow" class="fa-solid fa-arrow-right text-white text-lg"></i>
           </div>
           <span id="lane-label" class="text-xs text-amber-400 font-medium">EXIT RIGHT</span>
         </div>
-        <!-- Ego vehicle -->
+        <!-- Ego vehicle (centered) -->
         <div class="absolute bottom-16 left-1/2 -translate-x-1/2 w-14 h-24 bg-gradient-to-t from-slate-600 to-slate-700 rounded-xl border-2 border-cyan-400/80 flex items-center justify-center glow-cyan">
           <i class="fa-solid fa-car text-cyan-400 text-lg"></i>
         </div>
@@ -217,7 +228,7 @@
 </main>
 
 <script>
-  // Maneuvers queue with sensible progression
+  // Maneuvers (keep to right exit for this version)
   const maneuvers = [
     { id:'exit-right', label:'Exit right', arrow:'right', dist:350 },
     { id:'turn-left',  label:'Turn left',  arrow:'left',  dist:1200 },
@@ -241,17 +252,14 @@
   function iconFor(dir){ return dir==='right'?'fa-arrow-right':dir==='left'?'fa-arrow-left':'fa-arrow-up'; }
 
   function renderCenter(){
-    centerArrow.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-7xl md:text-8xl text-cyan-400';
+    centerArrow.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-6xl md:text-7xl text-cyan-400';
     laneArrowEl.className = 'fa-solid ' + iconFor(maneuvers[current].arrow) + ' text-white text-lg';
     laneLabelEl.textContent = maneuvers[current].arrow==='right' ? 'EXIT RIGHT' : maneuvers[current].arrow==='left' ? 'TURN LEFT' : 'STRAIGHT';
-    // Flash indicator when turning
     document.getElementById('lane-indicator').classList.toggle('flash', maneuvers[current].arrow!=='up');
-    // UPCOMING left tile flashing only when the upcoming is left
     if(maneuvers[current].arrow==='left'){ leftSignal.classList.add('flash'); } else { leftSignal.classList.remove('flash'); }
   }
 
   function renderUpcoming(){
-    // first item mirrors current distance
     nextExitEl.textContent = Math.max(1, Math.round(distanceM));
   }
 
