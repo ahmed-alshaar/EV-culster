@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Navigation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Orbitron', 'Inter', sans-serif; }
+        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4), 0 0 60px rgba(6, 182, 212, 0.2); }
+        .glow-blue { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 0 50px rgba(59, 130, 246, 0.2); }
+        .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+        .slide-in-right {
+            animation: slideInRight 400ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+        .glide-down {
+            animation: glideDown 400ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+        .progress-fill {
+            animation: progressFill 3s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+        .pulse-navigation {
+            animation: pulseNav 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes glideDown {
+            from { transform: translateY(-20px) scale(1); opacity: 1; }
+            to { transform: translateY(20px) scale(0.8); opacity: 0.8; }
+        }
+        @keyframes progressFill {
+            from { width: 0%; }
+            to { width: 75%; }
+        }
+        @keyframes pulseNav {
+            0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.6); }
+        }
+    </style>
+</head>
+<body class="bg-black overflow-hidden">
+
+<main id="navigation-screen" class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center relative">
+  
+  <!-- Ambient Background Effects -->
+  <div class="absolute inset-0 bg-gradient-radial from-cyan-500/8 via-transparent to-transparent pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+  
+  <!-- Main Navigation Container -->
+  <div id="navigation-container" class="relative w-[1400px] h-[600px] bg-gradient-to-b from-slate-900/40 to-black/60 border border-slate-800/60 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm">
+    
+    <!-- Top ETA Ribbon -->
+    <div id="eta-ribbon" class="absolute top-0 left-0 right-0 h-16 px-12 flex items-center justify-between bg-gradient-to-r from-slate-800/80 via-slate-700/60 to-slate-800/80 backdrop-blur-md z-30">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-3 text-cyan-400">
+          <i class="fa-solid fa-clock text-lg"></i>
+          <span class="text-xl font-medium tracking-wide">ETA 14:22</span>
+        </div>
+        <div class="w-px h-8 bg-slate-600"></div>
+        <div class="flex items-center gap-3 text-green-400">
+          <i class="fa-solid fa-battery-three-quarters text-lg"></i>
+          <span class="text-xl font-medium">51%</span>
+        </div>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="flex-1 mx-8">
+        <div class="w-full h-2 bg-slate-800/60 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full progress-fill glow-cyan"></div>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4 text-slate-400">
+        <span class="text-sm">München</span>
+        <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
+        <span class="text-sm">42 km</span>
+      </div>
+    </div>
+
+    <!-- Central Navigation Display -->
+    <div id="nav-central" class="absolute inset-0 pt-16 pb-24 flex items-center justify-center">
+      
+      <!-- Large Turn Arrow -->
+      <div id="turn-arrow" class="relative flex flex-col items-center slide-in-right">
+        
+        <!-- Main Turn Arrow -->
+        <div class="relative w-80 h-80 flex items-center justify-center mb-8 pulse-navigation">
+          <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 rounded-full blur-2xl"></div>
+          <div class="relative w-64 h-64 bg-slate-800/40 rounded-full border-4 border-cyan-400/60 flex items-center justify-center glow-cyan backdrop-blur-sm">
+            <i class="fa-solid fa-arrow-turn-up fa-rotate-90 text-8xl text-cyan-400"></i>
+          </div>
+        </div>
+        
+        <!-- Distance -->
+        <div class="text-center mb-6">
+          <div class="text-6xl font-light text-white tracking-tight">350</div>
+          <div class="text-2xl text-slate-400 font-medium tracking-wide">meters</div>
+        </div>
+        
+        <!-- Road Information -->
+        <div class="flex items-center gap-4 px-8 py-4 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+              <span class="text-sm font-bold text-black">A96</span>
+            </div>
+            <i class="fa-solid fa-arrow-right text-slate-400"></i>
+            <span class="text-xl text-white font-medium tracking-wide">München</span>
+          </div>
+        </div>
+        
+        <!-- Speed (Shifted Below) -->
+        <div id="speed-shifted" class="mt-8 glide-down">
+          <div class="flex items-center gap-4 px-6 py-3 bg-slate-900/60 rounded-xl border border-slate-700/40">
+            <span class="text-3xl text-slate-300 font-light">78</span>
+            <span class="text-lg text-slate-500">km/h</span>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+
+    <!-- Right Side - Enhanced Lane Assist -->
+    <div id="lane-assist" class="absolute right-8 top-20 bottom-24 w-80">
+      <div class="relative w-full h-full bg-slate-900/60 rounded-3xl border border-slate-700/60 overflow-hidden backdrop-blur-sm">
+        
+        <!-- Lane Header -->
+        <div class="absolute top-6 left-6 right-6 flex items-center justify-between">
+          <div class="flex items-center gap-3 text-cyan-400">
+            <i class="fa-solid fa-road text-lg"></i>
+            <span class="text-sm font-medium tracking-wide">LANE ASSIST</span>
+          </div>
+          <div class="px-3 py-1 bg-cyan-500/20 rounded-full border border-cyan-500/40">
+            <span class="text-xs text-cyan-400">ACTIVE</span>
+          </div>
+        </div>
+        
+        <!-- Lane View -->
+        <svg class="absolute inset-0 w-full h-full mt-20" viewBox="0 0 280 400" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="laneGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+              <stop offset="50%" style="stop-color:#06b6d4;stop-opacity:0.8" />
+              <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+            </linearGradient>
+          </defs>
+          
+          <!-- Highlighted Center Lane -->
+          <path d="M 90 400 L 110 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue"/>
+          <path d="M 170 400 L 150 80" stroke="url(#laneGlow)" stroke-width="6" fill="none" class="glow-blue"/>
+          
+          <!-- Adjacent Lanes -->
+          <path d="M 40 400 L 60 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none"/>
+          <path d="M 220 400 L 200 80" stroke="#475569" stroke-width="3" stroke-dasharray="20,12" fill="none"/>
+          
+          <!-- Lane Confidence Glow -->
+          <path d="M 85 400 L 105 80" stroke="#06b6d4" stroke-width="2" fill="none" opacity="0.6"/>
+          <path d="M 175 400 L 155 80" stroke="#06b6d4" stroke-width="2" fill="none" opacity="0.6"/>
+          
+          <!-- Turn Indicator Lanes -->
+          <path d="M 130 200 Q 180 150 220 120" stroke="#f59e0b" stroke-width="4" stroke-dasharray="15,8" fill="none" class="glow-amber"/>
+          
+        </svg>
+        
+        <!-- Navigation Indicator in Lane -->
+        <div class="absolute top-32 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+          <div class="w-12 h-8 bg-amber-500 rounded-lg border-2 border-white flex items-center justify-center glow-amber">
+            <i class="fa-solid fa-arrow-right text-white text-lg"></i>
+          </div>
+          <span class="text-xs text-amber-400 font-medium">EXIT RIGHT</span>
+        </div>
+        
+        <!-- Ego Vehicle -->
+        <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-16 h-24 bg-gradient-to-t from-slate-600 to-slate-700 rounded-xl border-2 border-cyan-400/80 flex items-center justify-center glow-cyan">
+          <i class="fa-solid fa-car text-cyan-400 text-xl"></i>
+        </div>
+        
+        <!-- Lane Status Indicators -->
+        <div class="absolute bottom-8 left-6 right-6 flex justify-between text-xs">
+          <div class="flex items-center gap-2 text-green-400">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>Clear</span>
+          </div>
+          <div class="flex items-center gap-2 text-cyan-400">
+            <i class="fa-solid fa-eye"></i>
+            <span>Tracking</span>
+          </div>
+          <div class="flex items-center gap-2 text-amber-400">
+            <i class="fa-solid fa-exclamation-triangle"></i>
+            <span>Merge</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left Side - Power & Navigation Info -->
+    <div id="nav-info" class="absolute left-8 top-20 bottom-24 w-64">
+      
+      <!-- Battery & Range -->
+      <div class="mb-8 p-6 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+        <div class="flex items-center gap-4 mb-4">
+          <i class="fa-solid fa-battery-three-quarters text-green-400 text-2xl"></i>
+          <div>
+            <div class="text-2xl text-white font-medium">64%</div>
+            <div class="text-sm text-slate-400">278 km range</div>
+          </div>
+        </div>
+        
+        <div class="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div class="w-16 h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full"></div>
+        </div>
+        
+        <div class="mt-4 flex justify-between text-xs text-slate-400">
+          <span>Arrival: 51%</span>
+          <span>Sufficient</span>
+        </div>
+      </div>
+      
+      <!-- Next Maneuvers -->
+      <div class="p-6 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+        <h3 class="text-sm text-cyan-400 font-medium tracking-wide mb-4">UPCOMING</h3>
+        
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-arrow-right text-amber-400 text-sm"></i>
+            </div>
+            <div class="flex-1">
+              <div class="text-white text-sm">Exit right</div>
+              <div class="text-slate-400 text-xs">350 m</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-arrow-left text-cyan-400 text-sm"></i>
+            </div>
+            <div class="flex-1">
+              <div class="text-white text-sm">Turn left</div>
+              <div class="text-slate-400 text-xs">1.2 km</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-slate-600/40 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-arrow-up text-slate-400 text-sm"></i>
+            </div>
+            <div class="flex-1">
+              <div class="text-slate-300 text-sm">Continue</div>
+              <div class="text-slate-400 text-xs">2.8 km</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Bottom Control Bar -->
+    <div id="nav-bottom-bar" class="absolute bottom-0 left-0 right-0 h-24 px-12 flex items-center justify-between bg-gradient-to-t from-slate-900/90 to-transparent backdrop-blur-md z-30">
+      
+      <!-- Left - Navigation Controls -->
+      <div class="flex items-center gap-6">
+        <button class="px-6 py-3 bg-slate-800/60 rounded-xl border border-slate-700/60 text-cyan-400 hover:bg-slate-700/60 transition-colors">
+          <i class="fa-solid fa-route text-lg mr-2"></i>
+          <span class="text-sm font-medium">REROUTE</span>
+        </button>
+        
+        <button class="px-6 py-3 bg-slate-800/60 rounded-xl border border-slate-700/60 text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-volume-up text-lg mr-2"></i>
+          <span class="text-sm font-medium">MUTE</span>
+        </button>
+      </div>
+      
+      <!-- Center - Trip Info -->
+      <div class="flex items-center gap-8 text-sm">
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-1">REMAINING</span>
+          <span class="text-white font-medium">42 km</span>
+        </div>
+        
+        <div class="w-px h-8 bg-slate-700"></div>
+        
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-1">TIME</span>
+          <span class="text-white font-medium">28 min</span>
+        </div>
+        
+        <div class="w-px h-8 bg-slate-700"></div>
+        
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-1">EFFICIENCY</span>
+          <span class="text-green-400 font-medium">+2.1%</span>
+        </div>
+      </div>
+      
+      <!-- Right - System Status -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 text-cyan-400">
+          <i class="fa-solid fa-satellite-dish text-lg"></i>
+          <span class="text-sm">GPS</span>
+        </div>
+        
+        <div class="flex items-center gap-2 text-green-400">
+          <i class="fa-solid fa-shield-halved text-lg"></i>
+          <span class="text-sm">AUTOPILOT</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Corner Accent Lights -->
+    <div class="absolute top-8 left-8 w-24 h-24 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute top-8 right-8 w-24 h-24 bg-gradient-to-bl from-amber-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute bottom-8 left-8 w-24 h-24 bg-gradient-to-tr from-cyan-400/20 to-transparent rounded-full blur-xl"></div>
+    <div class="absolute bottom-8 right-8 w-24 h-24 bg-gradient-to-tl from-amber-400/20 to-transparent rounded-full blur-xl"></div>
+    
+  </div>
+  
+</main>
+
+</body>
+</html>
