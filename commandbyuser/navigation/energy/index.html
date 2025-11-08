@@ -17,7 +17,7 @@
     .glow-orange{box-shadow:0 0 16px rgba(249,115,22,.25)}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     .fade-in{animation:fadeIn .6s ease both}
-    .counting{opacity:.001}
+    .counting{}
   </style>
 </head>
 <body class="bg-black text-white overflow-hidden">
@@ -264,142 +264,45 @@
       week: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
       month: Array.from({length:12},(_,i)=>`W${i+1}`)
     };
-    const x = labelSets[range] || labelSets.day;
-    const y = x.map((_,i)=> (i%3===0?-1:1) * (10+Math.round(Math.random()*35)) );
-    const colors = y.map(v=> v<0 ? '#10b981' : '#f97316');
-    const data = [{ x, y, type:'bar', marker:{ color: colors }, hovertemplate:'<b>%{x}</b><br>%{y} kW<extra></extra>' }];
-    const layout = {
-      margin:{t:10,r:10,b:30,l:40}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)',
-      xaxis:{tickfont:{color:'#94a3b8'}}, yaxis:{tickfont:{color:'#94a3b8'}, zeroline:true, zerolinecolor:'#06b6d4', zerolinewidth:2},
-      showlegend:false
-    };
-    Plotly.newPlot('energy-chart', data, layout, {responsive:true, displayModeBar:false, displaylogo:false});
-  }
-
-  function plotTrends(){
-    const speed = Array.from({length:80},()=>Math.round(20+Math.random()*100));
-    const eff = speed.map(s=> 24 - (s/12) + (Math.random()*2-1));
-    Plotly.newPlot('scatter-chart', [{x:speed, y:eff, mode:'markers', type:'scatter', marker:{size:6}}], {margin:{t:10,r:10,b:30,l:40}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)', xaxis:{title:'km/h', tickfont:{color:'#94a3b8'}}, yaxis:{title:'kWh/100km', tickfont:{color:'#94a3b8'}}}, {responsive:true, displayModeBar:false, displaylogo:false});
-
-    const days = Array.from({length:14},(_,i)=> i+1);
-    const vals = days.map(()=> 8+Math.random()*8);
-    Plotly.newPlot('area-chart', [{x:days, y:vals, type:'scatter', fill:'tozeroy'}], {margin:{t:10,r:10,b:30,l:40}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)', xaxis:{tickfont:{color:'#94a3b8'}}, yaxis:{tickfont:{color:'#94a3b8'}}}, {responsive:true, displayModeBar:false, displaylogo:false});
-  }
-
-  function plotDonut(){
-    const labels=['Braking','Downhill','Coasting'];
-    const values=[48,32,20];
-    Plotly.newPlot('donut-chart', [{labels, values, type:'pie', hole:.6}], {margin:{t:10,b:10}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)', showlegend:true, legend:{font:{color:'#cbd5e1'}}}, {responsive:true, displayModeBar:false, displaylogo:false});
-  }
-
-  // Initial plots
-  plotEnergy('day');
-  plotTrends();
-  plotDonut();
-
-  // range buttons
-  document.querySelectorAll('.range-btn').forEach(b=> b.addEventListener('click',()=> plotEnergy(b.dataset.range)));
-
-  // --- Counting animation with IntersectionObserver ---
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const counters = [
-    { id:'efficiency-value', to:14.2, step:0.2, fixed:1 },
-    { id:'recovered-value', to:8.4, step:0.15, fixed:1 },
-    { id:'distance-value', to:142, step:2, fixed:0, integer:true }
-  ];
-  function runCounters(){
-    counters.forEach(c=>{
-      const el = document.getElementById(c.id);
-      if(!el) return;
-      el.style.opacity=1;
-      let val = 0;
-      const tick = ()=>{
-        val = Math.min(val + c.step, c.to);
-        el.textContent = c.integer ? Math.floor(val) : val.toFixed(c.fixed);
-        if (val < c.to) requestAnimationFrame(tick);
-      };
-      if (prefersReduced){ el.textContent = c.integer ? Math.floor(c.to) : c.toFixed(c.fixed); return; }
-      requestAnimationFrame(tick);
-    });
-  }
-  const io = new IntersectionObserver((entries)=>{
-    if(entries.some(e=>e.isIntersecting)) { runCounters(); io.disconnect(); }
-  }, {threshold:.4});
-  counters.forEach(c=>{ const el=document.getElementById(c.id); if(el) io.observe(el); });
-
-  // Resize observer to keep charts crisp when container changes
-  new ResizeObserver(()=>{
-    ['energy-chart','scatter-chart','area-chart','donut-chart'].forEach(id=>{ const d=document.getElementById(id); if(d) Plotly.Plots.resize(d); });
-  }).observe(document.body);
-</script>
-
-<script>
-  // --- Tab controller ---
-  const tabs = document.querySelectorAll('.tab-btn');
-  const panels = {
-    overview: document.getElementById('panel-overview'),
-    trends: document.getElementById('panel-trends'),
-    breakdown: document.getElementById('panel-breakdown')
-  };
-  tabs.forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      tabs.forEach(b=>b.classList.remove('bg-cyan-500/20','border','border-cyan-500/40'));
-      btn.classList.add('bg-cyan-500/20','border','border-cyan-500/40');
-      Object.values(panels).forEach(p=>p.classList.add('hidden'));
-      panels[btn.dataset.tab].classList.remove('hidden');
-    });
-  });
-
-  // --- Energy Flow (pure CSS bars, guaranteed visible) ---
-  function plotEnergy(range){
-    const labelSets = {
-      day: ['00','02','04','06','08','10','12','14','16','18','20','22'],
-      week: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      month: Array.from({length:12},(_,i)=>`W${i+1}`)
-    };
     const labels = labelSets[range] || labelSets.day;
     const chart = document.getElementById('energy-chart');
     if(!chart) return;
     chart.innerHTML='';
+
     labels.forEach((lab,i)=>{
-      const val = (i%3===0?-1:1) * (10+Math.round(Math.random()*35)); // kW, negative means regen
+      const val = (i%3===0?-1:1) * (10+Math.round(Math.random()*35)); // kW
       const col = val<0 ? '#10b981' : '#f97316';
-      const bar = document.createElement('div');
-      bar.style.display='grid';
-      bar.style.gridTemplateRows = '1fr 1fr';
-      // top (regen) and bottom (consumption) segments
+
+      const colWrap = document.createElement('div');
+      colWrap.style.display='flex';
+      colWrap.style.flexDirection='column';
+
+      const halves = document.createElement('div');
+      halves.style.display='grid';
+      halves.style.gridTemplateRows='120px 120px';
+
       const top = document.createElement('div');
-      const bot = document.createElement('div');
-      top.style.display=bot.style.display='flex';
-      top.style.alignItems='flex-end';
-      bot.style.alignItems='flex-start';
+      const bottom = document.createElement('div');
+      top.style.display='flex'; top.style.alignItems='flex-end';
+      bottom.style.display='flex'; bottom.style.alignItems='flex-start';
+
       const seg = document.createElement('div');
       seg.style.width='100%';
-      seg.style.background=col;
-      seg.style.borderRadius='6px';
-      seg.style.filter='drop-shadow(0 0 8px rgba(16,185,129,.35))';
-      const h = Math.min(Math.abs(val)*3, 120); // px height cap for fit
-      if(val<0){ top.appendChild(seg); seg.style.height=h+'px'; bot.appendChild(document.createElement('div')); }
-      else { bot.appendChild(seg); seg.style.height=h+'px'; top.appendChild(document.createElement('div')); }
-      const wrap = document.createElement('div');
-      wrap.style.display='grid';
-      wrap.style.gridTemplateRows='1fr auto';
-      wrap.appendChild(top);
-      wrap.appendChild(bot);
-      chart.appendChild(wrap);
-      // label
+      seg.style.background=col; seg.style.borderRadius='6px';
+      seg.style.filter = val<0 ? 'drop-shadow(0 0 8px rgba(16,185,129,.35))' : 'drop-shadow(0 0 8px rgba(249,115,22,.35))';
+      const h = Math.min(Math.abs(val)*3, 110);
+      seg.style.height = h + 'px';
+
+      if(val<0){ top.appendChild(seg); bottom.appendChild(document.createElement('div')); }
+      else { bottom.appendChild(seg); top.appendChild(document.createElement('div')); }
+
+      halves.appendChild(top); halves.appendChild(bottom);
+
       const lbl = document.createElement('div');
-      lbl.textContent=lab;
-      lbl.style.fontSize='10px';
-      lbl.style.color='#94a3b8';
-      lbl.style.textAlign='center';
-      lbl.style.marginTop='4px';
-      const holder = document.createElement('div');
-      holder.style.display='flex';
-      holder.style.flexDirection='column';
-      holder.appendChild(wrap);
-      holder.appendChild(lbl);
-      chart.appendChild(holder);
+      lbl.textContent = lab; lbl.style.fontSize='10px'; lbl.style.color='#94a3b8'; lbl.style.textAlign='center'; lbl.style.marginTop='4px';
+
+      colWrap.appendChild(halves); colWrap.appendChild(lbl);
+      chart.appendChild(colWrap);
     });
   }
   plotEnergy('day');
@@ -416,7 +319,7 @@
     counters.forEach(c=>{
       const el = document.getElementById(c.id);
       if(!el) return;
-      el.style.opacity=1;
+      
       let val = 0;
       const tick = ()=>{
         val = Math.min(val + c.step, c.to);
@@ -427,7 +330,7 @@
       requestAnimationFrame(tick);
     });
   }
-  // start immediately (no scroll trigger)
+  // st scroll trigger)
   runCounters();
 </script>
 
