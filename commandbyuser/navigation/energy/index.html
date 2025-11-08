@@ -1,328 +1,327 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energy Analytics</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
-    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        ::-webkit-scrollbar { display: none;}
-        body { font-family: 'Orbitron', 'Inter', sans-serif; }
-        .glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
-        .glow-orange { box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
-        .glow-green { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-        .glow-teal { box-shadow: 0 0 15px rgba(20, 184, 166, 0.4); }
-        .energy-bar {
-            animation: growBar 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
-        }
-        .efficiency-counter {
-            animation: countUp 2s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
-        }
-        @keyframes growBar {
-            0% { transform: scaleY(0); transform-origin: bottom; }
-            100% { transform: scaleY(1); transform-origin: bottom; }
-        }
-        @keyframes countUp {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Energy Analytics • ARC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plotly.com/plotly-2.35.2.min.js"></script>
+  <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    ::-webkit-scrollbar{display:none}
+    body{font-family:'Orbitron','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    .glow-cyan{box-shadow:0 0 20px rgba(6,182,212,.25)}
+    .glow-green{box-shadow:0 0 16px rgba(34,197,94,.3)}
+    .glow-orange{box-shadow:0 0 16px rgba(249,115,22,.25)}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .6s ease both}
+    .counting{opacity:.001}
+  </style>
 </head>
-<body class="bg-black overflow-hidden">
+<body class="bg-black text-white overflow-hidden">
 
-<main id="energy-analytics-main" class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
-  
-  <div id="cluster-display" class="relative w-[1400px] h-[600px] bg-gradient-to-b from-slate-900/90 to-black border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
-    
-    <div class="absolute inset-0 bg-gradient-radial from-cyan-500/5 via-transparent to-transparent pointer-events-none"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-500/3 rounded-full blur-3xl pointer-events-none"></div>
-    
-    <div id="top-bar" class="absolute top-0 left-0 right-0 h-14 px-10 flex items-center justify-between bg-gradient-to-b from-slate-800/60 to-transparent backdrop-blur-sm z-30">
-      <div class="flex items-center gap-8 text-slate-400">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-clock text-sm"></i>
-          <span class="text-sm font-medium">14:32</span>
+<main class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
+  <div class="relative w-[min(94vw,1400px)] h-[min(90vh,760px)] md:h-[680px] bg-gradient-to-b from-slate-900/90 to-black border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
+
+    <!-- ambient -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute inset-0 bg-gradient-radial from-cyan-500/10 via-transparent to-transparent"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[520px] bg-cyan-500/8 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- HEADER (kept) -->
+    <header id="top-bar" class="absolute top-0 left-0 right-0 h-14 px-5 md:px-10 flex items-center justify-between bg-gradient-to-b from-slate-800/60 to-transparent backdrop-blur-sm z-30">
+      <div class="flex items-center gap-5 md:gap-8 text-slate-400 text-xs md:text-sm">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-clock"></i><span>14:32</span></div>
+        <div class="hidden md:flex items-center gap-2"><i class="fa-solid fa-temperature-half"></i><span>22°C</span></div>
+        <div class="hidden md:flex items-center gap-2"><i class="fa-solid fa-cloud-sun"></i><span>Partly Cloudy</span></div>
+      </div>
+      <div class="flex items-center gap-4 px-4 md:px-6 py-2.5 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md glow-cyan">
+        <div class="flex items-center gap-2 md:gap-3">
+          <i class="fa-solid fa-battery-three-quarters text-green-400 text-lg md:text-xl"></i>
+          <span class="text-base md:text-xl font-medium">64%</span>
         </div>
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-temperature-half text-sm"></i>
-          <span class="text-sm font-medium">22°C</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-cloud-sun text-sm"></i>
-          <span class="text-xs">Partly Cloudy</span>
+        <div class="hidden md:block w-px h-6 bg-slate-600"></div>
+        <div class="hidden md:flex items-center gap-2 md:gap-3">
+          <i class="fa-solid fa-road text-cyan-400 text-base md:text-lg"></i>
+          <span class="text-base md:text-xl font-medium">278 km</span>
         </div>
       </div>
-      
-      <div class="flex items-center gap-4 px-8 py-3 bg-slate-800/50 rounded-2xl border border-slate-700/60 backdrop-blur-md glow-cyan">
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <i class="fa-solid fa-battery-three-quarters text-green-400 text-xl"></i>
-            <div class="absolute inset-0 bg-green-400/20 rounded-lg blur-sm"></div>
-          </div>
-          <span class="text-xl text-white font-medium">64%</span>
-        </div>
-        
-        <div class="w-px h-6 bg-slate-600"></div>
-        
-        <div class="flex items-center gap-3">
-          <i class="fa-solid fa-road text-cyan-400 text-lg"></i>
-          <span class="text-xl text-white font-medium">278 km</span>
-        </div>
-      </div>
-      
-      <div class="flex items-center gap-6 text-slate-400">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-wifi text-sm"></i>
-          <span class="text-xs">5G</span>
-        </div>
-        <i class="fa-solid fa-signal text-sm"></i>
+      <div class="hidden md:flex items-center gap-6 text-slate-400 text-xs">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-wifi"></i><span>5G</span></div>
+        <i class="fa-solid fa-signal"></i>
         <div class="w-7 h-4 border border-slate-500 rounded-sm relative bg-slate-800/50">
           <div class="absolute left-0.5 top-0.5 bottom-0.5 w-4/5 bg-green-400 rounded-sm"></div>
-          <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-2 bg-slate-500 rounded-r-sm"></div>
+          <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-2 bg-slate-500 rounded-r-sm"></div>
         </div>
-        <i class="fa-solid fa-sun text-sm text-yellow-400"></i>
+        <i class="fa-solid fa-sun text-yellow-400"></i>
       </div>
-    </div>
+    </header>
 
-    <div id="main-display" class="absolute inset-0 pt-20 pb-24 px-16">
-      
-      <div id="energy-chart-container" class="relative h-[320px] bg-slate-900/60 rounded-3xl border border-slate-700/60 overflow-hidden backdrop-blur-sm mb-6 glow-cyan">
-        <div class="absolute top-4 left-6 z-20">
-          <h2 class="text-xl text-white font-medium tracking-wide mb-1">Energy Flow Analysis</h2>
-          <p class="text-sm text-slate-400">Regeneration vs Consumption</p>
+    <!-- CONTENT -->
+    <section class="absolute inset-0 pt-16 pb-24 px-4 sm:px-8">
+      <div class="h-full grid grid-rows-[auto,1fr] gap-4 md:gap-6">
+
+        <!-- Tabbed controls: reduce clutter -->
+        <div class="flex items-center justify-between">
+          <div class="flex gap-2 p-1 bg-slate-900/70 border border-slate-700/60 rounded-xl">
+            <button data-tab="overview" class="tab-btn px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm bg-cyan-500/20 border border-cyan-500/40">Overview</button>
+            <button data-tab="trends" class="tab-btn px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm text-slate-300 hover:bg-slate-800/50">Trends</button>
+            <button data-tab="breakdown" class="tab-btn px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm text-slate-300 hover:bg-slate-800/50">Breakdown</button>
+          </div>
+          <div class="hidden md:flex items-center gap-2 text-slate-400 text-xs">
+            <i class="fa-regular fa-circle-question"></i>
+            <span>Energy Analytics</span>
+          </div>
         </div>
-        
-        <div id="energy-chart" style="height: 320px;" class="w-full"></div>
+
+        <!-- Panels -->
+        <div class="relative w-full h-full overflow-hidden">
+          <!-- OVERVIEW -->
+          <div id="panel-overview" class="absolute inset-0 overflow-y-auto pr-1 space-y-4 md:space-y-6 fade-in">
+            <div class="grid lg:grid-cols-5 gap-4 md:gap-6">
+              <!-- Chart takes 3 cols desktop, auto on mobile -->
+              <div class="lg:col-span-3 bg-slate-900/60 rounded-3xl border border-slate-700/60 backdrop-blur-sm glow-cyan p-4 md:p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <div>
+                    <h2 class="text-base md:text-lg font-medium tracking-wide">Energy Flow</h2>
+                    <p class="text-xs md:text-sm text-slate-400">Regeneration vs Consumption</p>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs">
+                    <button class="range-btn px-2 py-1 rounded bg-slate-800/70 border border-slate-700/60" data-range="day">Day</button>
+                    <button class="range-btn px-2 py-1 rounded hover:bg-slate-800/60" data-range="week">Week</button>
+                    <button class="range-btn px-2 py-1 rounded hover:bg-slate-800/60" data-range="month">Month</button>
+                  </div>
+                </div>
+                <div id="energy-chart" class="w-full" style="height: 280px"></div>
+              </div>
+
+              <!-- KPIs -->
+              <div class="lg:col-span-2 grid sm:grid-cols-3 lg:grid-cols-1 gap-4 md:gap-5">
+                <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4 md:p-6 backdrop-blur-sm glow-green">
+                  <div class="flex items-center gap-2 mb-2 md:mb-3"><i class="fa-solid fa-leaf text-teal-400"></i><span class="text-[11px] md:text-xs text-slate-400 tracking-wide">AVG EFFICIENCY</span></div>
+                  <div><span id="efficiency-value" class="counting text-2xl md:text-3xl text-teal-400 font-bold">14.2</span><span class="text-sm md:text-base text-slate-300 ml-2">kWh/100km</span></div>
+                  <div class="mt-2 flex items-center gap-2 text-[10px] md:text-xs text-green-400"><i class="fa-solid fa-arrow-down"></i><span>2.1% vs last week</span></div>
+                </div>
+                <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4 md:p-6 backdrop-blur-sm">
+                  <div class="flex items-center gap-2 mb-2 md:mb-3"><i class="fa-solid fa-recycle text-green-400"></i><span class="text-[11px] md:text-xs text-slate-400 tracking-wide">ENERGY RECOVERED</span></div>
+                  <div><span id="recovered-value" class="counting text-2xl md:text-3xl text-green-400 font-bold">8.4</span><span class="text-sm md:text-base text-slate-300 ml-2">kWh</span></div>
+                  <div class="mt-2 text-[10px] md:text-xs text-slate-400">Today's session</div>
+                </div>
+                <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4 md:p-6 backdrop-blur-sm glow-orange">
+                  <div class="flex items-center gap-2 mb-2 md:mb-3"><i class="fa-solid fa-route text-orange-400"></i><span class="text-[11px] md:text-xs text-slate-400 tracking-wide">DISTANCE SINCE CHARGE</span></div>
+                  <div><span id="distance-value" class="counting text-2xl md:text-3xl text-orange-400 font-bold">142</span><span class="text-sm md:text-base text-slate-300 ml-2">km</span></div>
+                  <div class="mt-2 text-[10px] md:text-xs text-slate-400">36% used</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compact cards row -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-400">Drive Style</span><i class="fa-solid fa-gauge-high text-cyan-400"></i></div>
+                <div class="text-lg font-semibold">Balanced</div>
+                <div class="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-2 w-3/5 bg-cyan-400"></div></div>
+              </div>
+              <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-400">HVAC Share</span><i class="fa-solid fa-snowflake text-cyan-300"></i></div>
+                <div class="text-lg font-semibold">18%</div>
+                <div class="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-2 w-[18%] bg-cyan-400"></div></div>
+              </div>
+              <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-400">Tires & Road</span><i class="fa-solid fa-road text-slate-300"></i></div>
+                <div class="text-lg font-semibold">Low Impact</div>
+                <div class="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-2 w-2/5 bg-green-400"></div></div>
+              </div>
+              <div class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-400">Aux Systems</span><i class="fa-solid fa-plug text-slate-300"></i></div>
+                <div class="text-lg font-semibold">Moderate</div>
+                <div class="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-2 w-1/2 bg-orange-400"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TRENDS -->
+          <div id="panel-trends" class="absolute inset-0 overflow-y-auto pr-1 hidden">
+            <div class="grid lg:grid-cols-2 gap-4 md:gap-6">
+              <div class="bg-slate-900/60 rounded-3xl border border-slate-700/60 p-4 md:p-6 glow-cyan">
+                <div class="flex items-center justify-between mb-3"><h3 class="text-lg font-medium">Efficiency vs Speed</h3><span class="text-xs text-slate-400">Last 30 days</span></div>
+                <div id="scatter-chart" style="height:300px"></div>
+              </div>
+              <div class="bg-slate-900/60 rounded-3xl border border-slate-700/60 p-4 md:p-6">
+                <div class="flex items-center justify-between mb-3"><h3 class="text-lg font-medium">Daily Consumption</h3><span class="text-xs text-slate-400">kWh</span></div>
+                <div id="area-chart" style="height:300px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BREAKDOWN -->
+          <div id="panel-breakdown" class="absolute inset-0 overflow-y-auto pr-1 hidden">
+            <div class="grid lg:grid-cols-2 gap-4 md:gap-6">
+              <div class="bg-slate-900/60 rounded-3xl border border-slate-700/60 p-4 md:p-6">
+                <h3 class="text-lg font-medium mb-3">Systems Breakdown</h3>
+                <div class="space-y-2">
+                  <!-- accordion items -->
+                  <details class="rounded-xl border border-slate-700/60 p-3 open:bg-slate-800/40">
+                    <summary class="cursor-pointer text-sm flex items-center justify-between">Powertrain<span class="text-slate-400">52%</span></summary>
+                    <div class="mt-2 text-sm text-slate-300">Motor, inverter and drivetrain losses.</div>
+                  </details>
+                  <details class="rounded-xl border border-slate-700/60 p-3 open:bg-slate-800/40">
+                    <summary class="cursor-pointer text-sm flex items-center justify-between">HVAC<span class="text-slate-400">18%</span></summary>
+                    <div class="mt-2 text-sm text-slate-300">Heating/cooling including cabin pre‑conditioning.</div>
+                  </details>
+                  <details class="rounded-xl border border-slate-700/60 p-3 open:bg-slate-800/40">
+                    <summary class="cursor-pointer text-sm flex items-center justify-between">Electronics<span class="text-slate-400">12%</span></summary>
+                    <div class="mt-2 text-sm text-slate-300">Infotainment, ADAS, lights and accessories.</div>
+                  </details>
+                  <details class="rounded-xl border border-slate-700/60 p-3 open:bg-slate-800/40">
+                    <summary class="cursor-pointer text-sm flex items-center justify-between">Tires & Road<span class="text-slate-400">10%</span></summary>
+                    <div class="mt-2 text-sm text-slate-300">Rolling resistance and surface quality.</div>
+                  </details>
+                </div>
+              </div>
+              <div class="bg-slate-900/60 rounded-3xl border border-slate-700/60 p-4 md:p-6 glow-green">
+                <div class="flex items-center justify-between mb-3"><h3 class="text-lg font-medium">Regeneration Share</h3><span class="text-xs text-slate-400">Today</span></div>
+                <div id="donut-chart" style="height:300px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+    </section>
 
-      <div id="kpi-section" class="grid grid-cols-3 gap-8">
-        
-        <div id="avg-efficiency-card" class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-6 backdrop-blur-sm glow-teal">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fa-solid fa-leaf text-teal-400 text-xl"></i>
-            <span class="text-sm text-slate-400 tracking-wide">AVG EFFICIENCY</span>
-          </div>
-          <div class="efficiency-counter">
-            <span class="text-3xl text-teal-400 font-bold tracking-tight" id="efficiency-value">14.2</span>
-            <span class="text-lg text-slate-300 ml-2">kWh/100km</span>
-          </div>
-          <div class="mt-3 flex items-center gap-2 text-xs text-green-400">
-            <i class="fa-solid fa-arrow-down"></i>
-            <span>2.1% vs last week</span>
-          </div>
+    <!-- FOOTER (kept) -->
+    <footer id="bottom-bar" class="absolute bottom-0 left-0 right-0 h-20 px-5 md:px-10 flex items-center justify-between bg-gradient-to-t from-slate-900/90 to-transparent backdrop-blur-md z-30">
+      <div class="flex items-center gap-4 md:gap-6">
+        <div class="flex items-center gap-1 px-4 md:px-6 py-2.5 bg-slate-800/60 rounded-xl border border-slate-700/60">
+          <span class="text-xs md:text-sm text-slate-500 px-2">P</span>
+          <span class="text-xs md:text-sm text-slate-500 px-2">R</span>
+          <span class="text-xs md:text-sm text-slate-500 px-2">N</span>
+          <span class="text-xl md:text-2xl text-white px-2 bg-cyan-500/20 rounded-lg border border-cyan-500/40">D</span>
         </div>
-
-        <div id="energy-recovered-card" class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-6 backdrop-blur-sm glow-green">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fa-solid fa-recycle text-green-400 text-xl"></i>
-            <span class="text-sm text-slate-400 tracking-wide">ENERGY RECOVERED</span>
-          </div>
-          <div class="efficiency-counter" style="animation-delay: 0.2s;">
-            <span class="text-3xl text-green-400 font-bold tracking-tight" id="recovered-value">8.4</span>
-            <span class="text-lg text-slate-300 ml-2">kWh</span>
-          </div>
-          <div class="mt-3 flex items-center gap-2 text-xs text-slate-400">
-            <i class="fa-solid fa-clock"></i>
-            <span>Today's session</span>
-          </div>
-        </div>
-
-        <div id="distance-charge-card" class="bg-slate-900/60 rounded-2xl border border-slate-700/60 p-6 backdrop-blur-sm glow-orange">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fa-solid fa-route text-orange-400 text-xl"></i>
-            <span class="text-sm text-slate-400 tracking-wide">DISTANCE SINCE CHARGE</span>
-          </div>
-          <div class="efficiency-counter" style="animation-delay: 0.4s;">
-            <span class="text-3xl text-orange-400 font-bold tracking-tight" id="distance-value">142</span>
-            <span class="text-lg text-slate-300 ml-2">km</span>
-          </div>
-          <div class="mt-3 flex items-center gap-2 text-xs text-slate-400">
-            <i class="fa-solid fa-battery-half"></i>
-            <span>36% used</span>
-          </div>
-        </div>
-
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-red-500 bg-white flex items-center justify-center"><span class="text-base md:text-lg font-bold text-black">50</span></div>
+        <div class="hidden sm:flex items-center gap-2 text-slate-500"><i class="fa-solid fa-hand text-xs"></i><span class="text-[10px] md:text-xs">P‑BRAKE</span></div>
       </div>
-    </div>
-
-    <div id="bottom-bar" class="absolute bottom-0 left-0 right-0 h-20 px-10 flex items-center justify-between bg-gradient-to-t from-slate-900/90 to-transparent backdrop-blur-md z-30">
-      
-      <div class="flex items-center gap-6">
-        <div class="flex items-center gap-1 px-6 py-3 bg-slate-800/60 rounded-xl border border-slate-700/60">
-          <span class="text-sm text-slate-500 px-2">P</span>
-          <span class="text-sm text-slate-500 px-2">R</span>
-          <span class="text-sm text-slate-500 px-2">N</span>
-          <span class="text-2xl text-white px-2 bg-cyan-500/20 rounded-lg border border-cyan-500/40">D</span>
-        </div>
-        
-        <div class="w-12 h-12 rounded-full border-4 border-red-500 bg-white flex items-center justify-center">
-          <span class="text-lg font-bold text-black">50</span>
-        </div>
-        
-        <div class="flex items-center gap-2 text-slate-500">
-          <i class="fa-solid fa-hand-paper text-sm"></i>
-          <span class="text-xs">P-BRAKE</span>
-        </div>
-      </div>
-      
-      <div class="flex items-center gap-8 text-sm">
-        <div class="flex flex-col items-center">
-          <span class="text-xs text-slate-500 mb-1">MODE</span>
-          <span class="text-white font-medium">ECO</span>
-        </div>
-        
+      <div class="hidden md:flex items-center gap-8 text-sm">
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">MODE</span><span class="font-medium">ECO</span></div>
         <div class="w-px h-10 bg-slate-700"></div>
-        
-        <div class="flex flex-col items-center">
-          <span class="text-xs text-slate-500 mb-1">REGEN</span>
-          <span class="text-white font-medium">AUTO</span>
-        </div>
-        
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">REGEN</span><span class="font-medium">AUTO</span></div>
         <div class="w-px h-10 bg-slate-700"></div>
-        
-        <div class="flex flex-col items-center">
-          <span class="text-xs text-slate-500 mb-1">CLIMATE</span>
-          <span class="text-white font-medium">22°C</span>
-        </div>
-        
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">CLIMATE</span><span class="font-medium">22°C</span></div>
         <div class="w-px h-10 bg-slate-700"></div>
-        
-        <div class="flex flex-col items-center">
-          <span class="text-xs text-slate-500 mb-1">OUTSIDE</span>
-          <span class="text-white font-medium">22°C</span>
-        </div>
+        <div class="flex flex-col items-center"><span class="text-xs text-slate-500 mb-1">OUTSIDE</span><span class="font-medium">22°C</span></div>
       </div>
-      
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-3 px-4 py-2 bg-slate-800/50 rounded-xl border border-slate-700/60">
+      <div class="flex items-center gap-3 md:gap-4">
+        <div class="hidden sm:flex items-center gap-3 px-3 md:px-4 py-2 bg-slate-800/50 rounded-xl border border-slate-700/60">
           <i class="fa-solid fa-chart-line text-cyan-400 text-lg"></i>
-          <div class="flex flex-col">
-            <span class="text-sm text-white font-medium">Energy Analytics</span>
+          <div class="hidden md:flex flex-col">
+            <span class="text-sm font-medium">Energy Analytics</span>
             <span class="text-xs text-slate-400">Active View</span>
           </div>
         </div>
-        
         <div class="flex items-center gap-3 text-slate-400">
           <i class="fa-solid fa-cog text-lg"></i>
           <i class="fa-solid fa-home text-lg"></i>
         </div>
       </div>
-    </div>
+    </footer>
   </div>
-  
 </main>
 
 <script>
-window.addEventListener('load', function() {
-  try {
-    const energyData = [
-      {
-        x: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
-        y: [-12, -8, -15, 25, 45, 35, 28, 18, 32, 22, -18, -10],
-        type: 'bar',
-        name: 'Energy Flow',
-        marker: {
-          color: ['#10b981', '#10b981', '#10b981', '#f97316', '#f97316', '#f97316', '#f97316', '#f97316', '#f97316', '#f97316', '#10b981', '#10b981']
-        },
-        hovertemplate: '<b>%{x}</b><br>%{y} kW<br><extra></extra>'
-      }
-    ];
+  // --- Tab controller ---
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = {
+    overview: document.getElementById('panel-overview'),
+    trends: document.getElementById('panel-trends'),
+    breakdown: document.getElementById('panel-breakdown')
+  };
+  tabs.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      tabs.forEach(b=>b.classList.remove('bg-cyan-500/20','border','border-cyan-500/40'));
+      btn.classList.add('bg-cyan-500/20','border','border-cyan-500/40');
+      Object.values(panels).forEach(p=>p.classList.add('hidden'));
+      panels[btn.dataset.tab].classList.remove('hidden');
+    });
+  });
 
+  // --- Plotly helpers ---
+  function plotEnergy(range){
+    const labelSets = {
+      day: ['00','02','04','06','08','10','12','14','16','18','20','22'],
+      week: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      month: Array.from({length:12},(_,i)=>`W${i+1}`)
+    };
+    const x = labelSets[range] || labelSets.day;
+    const y = x.map((_,i)=> (i%3===0?-1:1) * (10+Math.round(Math.random()*35)) );
+    const colors = y.map(v=> v<0 ? '#10b981' : '#f97316');
+    const data = [{ x, y, type:'bar', marker:{ color: colors }, hovertemplate:'<b>%{x}</b><br>%{y} kW<extra></extra>' }];
     const layout = {
-      title: {
-        text: '',
-        font: { size: 0 }
-      },
-      xaxis: {
-        title: '',
-        gridcolor: '#475569',
-        tickcolor: '#64748b',
-        tickfont: { color: '#94a3b8', size: 12 }
-      },
-      yaxis: {
-        title: '',
-        gridcolor: '#475569',
-        tickcolor: '#64748b',
-        tickfont: { color: '#94a3b8', size: 12 },
-        zeroline: true,
-        zerolinecolor: '#06b6d4',
-        zerolinewidth: 2
-      },
-      margin: { t: 60, r: 20, b: 40, l: 60 },
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      showlegend: false,
-      annotations: [
-        {
-          x: 0.02,
-          y: 0.98,
-          xref: 'paper',
-          yref: 'paper',
-          text: 'Regeneration',
-          showarrow: false,
-          font: { color: '#10b981', size: 12 },
-          xanchor: 'left',
-          yanchor: 'top'
-        },
-        {
-          x: 0.02,
-          y: 0.05,
-          xref: 'paper',
-          yref: 'paper',
-          text: 'Consumption',
-          showarrow: false,
-          font: { color: '#f97316', size: 12 },
-          xanchor: 'left',
-          yanchor: 'bottom'
-        }
-      ]
+      margin:{t:10,r:10,b:30,l:40}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)',
+      xaxis:{tickfont:{color:'#94a3b8'}}, yaxis:{tickfont:{color:'#94a3b8'}, zeroline:true, zerolinecolor:'#06b6d4', zerolinewidth:2},
+      showlegend:false
     };
-
-    const config = {
-      responsive: true,
-      displayModeBar: false,
-      displaylogo: false
-    };
-
-    Plotly.newPlot('energy-chart', energyData, layout, config);
-
-    setTimeout(() => {
-      let efficiencyValue = 0;
-      let recoveredValue = 0;
-      let distanceValue = 0;
-      
-      const efficiencyTarget = 14.2;
-      const recoveredTarget = 8.4;
-      const distanceTarget = 142;
-      
-      const interval = setInterval(() => {
-        if (efficiencyValue < efficiencyTarget) {
-          efficiencyValue += 0.2;
-          document.getElementById('efficiency-value').textContent = efficiencyValue.toFixed(1);
-        }
-        if (recoveredValue < recoveredTarget) {
-          recoveredValue += 0.15;
-          document.getElementById('recovered-value').textContent = recoveredValue.toFixed(1);
-        }
-        if (distanceValue < distanceTarget) {
-          distanceValue += 2;
-          document.getElementById('distance-value').textContent = Math.floor(distanceValue);
-        }
-        
-        if (efficiencyValue >= efficiencyTarget && recoveredValue >= recoveredTarget && distanceValue >= distanceTarget) {
-          clearInterval(interval);
-        }
-      }, 50);
-    }, 800);
-
-  } catch(e) {
-    document.getElementById('energy-chart').innerHTML = '<div class="flex items-center justify-center h-full text-slate-400">Chart loading...</div>';
+    Plotly.newPlot('energy-chart', data, layout, {responsive:true, displayModeBar:false, displaylogo:false});
   }
-});
+
+  function plotTrends(){
+    const speed = Array.from({length:80},()=>Math.round(20+Math.random()*100));
+    const eff = speed.map(s=> 24 - (s/12) + (Math.random()*2-1));
+    Plotly.newPlot('scatter-chart', [{x:speed, y:eff, mode:'markers', type:'scatter', marker:{size:6}}], {margin:{t:10,r:10,b:30,l:40}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)', xaxis:{title:'km/h', tickfont:{color:'#94a3b8'}}, yaxis:{title:'kWh/100km', tickfont:{color:'#94a3b8'}}}, {responsive:true, displayModeBar:false, displaylogo:false});
+
+    const days = Array.from({length:14},(_,i)=> i+1);
+    const vals = days.map(()=> 8+Math.random()*8);
+    Plotly.newPlot('area-chart', [{x:days, y:vals, type:'scatter', fill:'tozeroy'}], {margin:{t:10,r:10,b:30,l:40}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)', xaxis:{tickfont:{color:'#94a3b8'}}, yaxis:{tickfont:{color:'#94a3b8'}}}, {responsive:true, displayModeBar:false, displaylogo:false});
+  }
+
+  function plotDonut(){
+    const labels=['Braking','Downhill','Coasting'];
+    const values=[48,32,20];
+    Plotly.newPlot('donut-chart', [{labels, values, type:'pie', hole:.6}], {margin:{t:10,b:10}, plot_bgcolor:'rgba(0,0,0,0)', paper_bgcolor:'rgba(0,0,0,0)', showlegend:true, legend:{font:{color:'#cbd5e1'}}}, {responsive:true, displayModeBar:false, displaylogo:false});
+  }
+
+  // Initial plots
+  plotEnergy('day');
+  plotTrends();
+  plotDonut();
+
+  // range buttons
+  document.querySelectorAll('.range-btn').forEach(b=> b.addEventListener('click',()=> plotEnergy(b.dataset.range)));
+
+  // --- Counting animation with IntersectionObserver ---
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const counters = [
+    { id:'efficiency-value', to:14.2, step:0.2, fixed:1 },
+    { id:'recovered-value', to:8.4, step:0.15, fixed:1 },
+    { id:'distance-value', to:142, step:2, fixed:0, integer:true }
+  ];
+  function runCounters(){
+    counters.forEach(c=>{
+      const el = document.getElementById(c.id);
+      if(!el) return;
+      el.style.opacity=1;
+      let val = 0;
+      const tick = ()=>{
+        val = Math.min(val + c.step, c.to);
+        el.textContent = c.integer ? Math.floor(val) : val.toFixed(c.fixed);
+        if (val < c.to) requestAnimationFrame(tick);
+      };
+      if (prefersReduced){ el.textContent = c.integer ? Math.floor(c.to) : c.toFixed(c.fixed); return; }
+      requestAnimationFrame(tick);
+    });
+  }
+  const io = new IntersectionObserver((entries)=>{
+    if(entries.some(e=>e.isIntersecting)) { runCounters(); io.disconnect(); }
+  }, {threshold:.4});
+  counters.forEach(c=>{ const el=document.getElementById(c.id); if(el) io.observe(el); });
+
+  // Resize observer to keep charts crisp when container changes
+  new ResizeObserver(()=>{
+    ['energy-chart','scatter-chart','area-chart','donut-chart'].forEach(id=>{ const d=document.getElementById(id); if(d) Plotly.Plots.resize(d); });
+  }).observe(document.body);
 </script>
 
 </body>
