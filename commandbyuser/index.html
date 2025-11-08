@@ -1,0 +1,192 @@
+```html
+<main id="ev-cluster-main" class="w-full h-[600px] bg-gradient-to-b from-neutral-900 via-black to-neutral-900 flex items-center justify-center overflow-hidden">
+  
+  <!-- Main Cluster Container - 21:9 Aspect Ratio -->
+  <div id="cluster-display" class="relative w-[1400px] h-[600px] bg-black border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl">
+    
+    <!-- Top Status Bar -->
+    <div id="top-bar" class="absolute top-0 left-0 right-0 h-12 px-8 flex items-center justify-between bg-gradient-to-b from-neutral-900/80 to-transparent backdrop-blur-sm z-20">
+      <!-- Left Status Icons -->
+      <div class="flex items-center gap-6 text-neutral-400">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-clock text-sm"></i>
+          <span class="text-sm">14:32</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-temperature-half text-sm"></i>
+          <span class="text-sm">22°C</span>
+        </div>
+      </div>
+      
+      <!-- Right Status Icons -->
+      <div class="flex items-center gap-5 text-neutral-400">
+        <i class="fa-solid fa-wifi text-sm"></i>
+        <i class="fa-solid fa-signal text-sm"></i>
+        <div class="w-6 h-3 border border-neutral-500 rounded-sm relative">
+          <div class="absolute left-0 top-0 bottom-0 w-4/5 bg-neutral-400 rounded-l-sm"></div>
+        </div>
+        <i class="fa-solid fa-sun text-sm"></i>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-display" class="absolute inset-0 pt-12 pb-16 flex items-center justify-between px-16">
+      
+      <!-- Left Side - Power/Regen Gauge -->
+      <div id="power-gauge" class="flex flex-col items-center h-[400px] w-20">
+        <div class="relative h-full w-12 bg-neutral-800/50 rounded-full overflow-hidden border border-neutral-700">
+          <!-- Power Section (Top Half) -->
+          <div class="absolute top-0 left-0 right-0 h-1/2 flex flex-col justify-end p-1">
+            <div class="w-full h-[30%] bg-gradient-to-t from-neutral-600 to-neutral-500 rounded-full opacity-60"></div>
+          </div>
+          
+          <!-- Center Zero Line -->
+          <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-neutral-500 transform -translate-y-1/2"></div>
+          
+          <!-- Regen Section (Bottom Half) -->
+          <div class="absolute bottom-0 left-0 right-0 h-1/2 flex flex-col justify-start p-1">
+            <div class="w-full h-[15%] bg-gradient-to-b from-neutral-500 to-neutral-600 rounded-full opacity-50"></div>
+          </div>
+          
+          <!-- Scale Markers -->
+          <div class="absolute inset-0 flex flex-col justify-between py-4 px-1">
+            <div class="w-full h-px bg-neutral-600"></div>
+            <div class="w-full h-px bg-neutral-600"></div>
+            <div class="w-full h-px bg-neutral-500"></div>
+            <div class="w-full h-px bg-neutral-600"></div>
+            <div class="w-full h-px bg-neutral-600"></div>
+          </div>
+        </div>
+        
+        <!-- Labels -->
+        <div class="flex flex-col items-center mt-4 text-xs text-neutral-500 gap-1">
+          <span class="text-neutral-500">PWR</span>
+          <span class="text-neutral-500">REGEN</span>
+        </div>
+      </div>
+
+      <!-- Center - Primary Speed Display -->
+      <div id="speed-display" class="flex flex-col items-center justify-center">
+        <!-- Main Speed -->
+        <div class="relative mb-6">
+          <div class="text-[120px] leading-none text-white tracking-tight">78</div>
+          <div class="absolute -right-16 bottom-4 text-2xl text-neutral-500">km/h</div>
+        </div>
+        
+        <!-- Battery & Range Indicator -->
+        <div class="flex items-center gap-3 px-8 py-3 bg-neutral-800/60 rounded-full border border-neutral-700 backdrop-blur-sm">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-battery-three-quarters text-neutral-400 text-lg"></i>
+            <span class="text-xl text-white">64%</span>
+          </div>
+          
+          <div class="w-px h-6 bg-neutral-600"></div>
+          
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-road text-neutral-400 text-sm"></i>
+            <span class="text-xl text-white">278 km</span>
+          </div>
+        </div>
+        
+        <!-- Drive Mode Indicator -->
+        <div class="mt-6 px-4 py-1 bg-neutral-500/20 rounded-full border border-neutral-500/40">
+          <span class="text-xs text-neutral-400 tracking-wider">NORMAL MODE</span>
+        </div>
+      </div>
+
+      <!-- Right Side - ADAS Lane Assist Visual -->
+      <div id="adas-display" class="flex flex-col items-center h-[400px] w-64">
+        <div class="relative w-full h-full bg-neutral-900/50 rounded-2xl border border-neutral-700 overflow-hidden">
+          <!-- Road Perspective View -->
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 200 300" preserveAspectRatio="none">
+            <!-- Left Lane Line -->
+            <path d="M 60 300 L 75 0" stroke="#525252" stroke-width="2" stroke-dasharray="20,10" fill="none"/>
+            <!-- Right Lane Line -->
+            <path d="M 140 300 L 125 0" stroke="#525252" stroke-width="2" stroke-dasharray="20,10" fill="none"/>
+            <!-- Center Lane Lines (Ego Lane) -->
+            <path d="M 100 300 L 100 0" stroke="#06b6d4" stroke-width="3" stroke-dasharray="15,10" fill="none" opacity="0.6"/>
+          </svg>
+          
+          <!-- Lead Vehicle Indicator -->
+          <div class="absolute top-24 left-1/2 transform -translate-x-1/2 w-16 h-10 bg-neutral-700 rounded-sm border-2 border-neutral-400 flex items-center justify-center">
+            <i class="fa-solid fa-car text-neutral-400 text-lg"></i>
+          </div>
+          
+          <!-- Distance Indicator -->
+          <div class="absolute top-40 left-1/2 transform -translate-x-1/2 flex items-center gap-1 text-neutral-400">
+            <i class="fa-solid fa-arrows-up-down text-xs"></i>
+            <span class="text-xs">42m</span>
+          </div>
+          
+          <!-- Ego Vehicle (Bottom) -->
+          <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-12 h-16 bg-gradient-to-t from-neutral-600 to-neutral-700 rounded-sm border-2 border-white/60"></div>
+        </div>
+        
+        <!-- ADAS Status Label -->
+        <div class="mt-4 flex flex-col items-center gap-1">
+          <div class="flex items-center gap-2 text-neutral-400">
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+            <span class="text-xs tracking-wide">LANE ASSIST</span>
+          </div>
+          <span class="text-xs text-neutral-500">Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Control Bar -->
+    <div id="bottom-bar" class="absolute bottom-0 left-0 right-0 h-16 px-8 flex items-center justify-between bg-gradient-to-t from-neutral-900/90 to-transparent backdrop-blur-sm z-20">
+      
+      <!-- Left - Gear Selector -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 px-4 py-2 bg-neutral-800 rounded-lg border border-neutral-700">
+          <span class="text-xs text-neutral-500">P</span>
+          <span class="text-xs text-neutral-500">R</span>
+          <span class="text-xs text-neutral-500">N</span>
+          <span class="text-xl text-white">D</span>
+        </div>
+        
+        <!-- Speed Limit -->
+        <div class="w-10 h-10 rounded-full border-2 border-neutral-500 flex items-center justify-center bg-white">
+          <span class="text-sm text-black">50</span>
+        </div>
+      </div>
+      
+      <!-- Center - Trip Info -->
+      <div class="flex items-center gap-8 text-sm text-neutral-400">
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-neutral-500">AVG</span>
+          <span class="text-white">14.2 kWh</span>
+        </div>
+        
+        <div class="w-px h-8 bg-neutral-700"></div>
+        
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-neutral-500">TRIP</span>
+          <span class="text-white">142.8 km</span>
+        </div>
+        
+        <div class="w-px h-8 bg-neutral-700"></div>
+        
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-neutral-500">TIME</span>
+          <span class="text-white">2h 14m</span>
+        </div>
+      </div>
+      
+      <!-- Right - Media Info -->
+      <div class="flex items-center gap-3 px-4 py-2 bg-neutral-800/50 rounded-lg border border-neutral-700">
+        <i class="fa-solid fa-music text-neutral-500 text-sm"></i>
+        <div class="flex flex-col">
+          <span class="text-xs text-white">Driving Playlist</span>
+          <span class="text-xs text-neutral-500">Spotify</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ambient Glow Effects -->
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-neutral-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    
+  </div>
+  
+</main>
+```
