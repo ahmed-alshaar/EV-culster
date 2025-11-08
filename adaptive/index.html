@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive Cruise Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Orbitron', 'Inter', sans-serif; }
+        .glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+        .glow-amber { box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+        .glow-green { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+        .glow-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        
+        .lane-pulse {
+            animation: lanePulse 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .lead-car-scale {
+            animation: leadCarScale 4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        .acc-indicator {
+            animation: accIndicator 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+        
+        @keyframes lanePulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        @keyframes leadCarScale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes accIndicator {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-black overflow-hidden">
+
+<main id="acc-cluster-main" class="w-full h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
+  
+  <div id="cluster-display" class="relative w-[1400px] h-[600px] bg-gradient-to-b from-slate-900/90 to-black border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
+    
+    <div class="absolute inset-0 bg-gradient-radial from-cyan-500/5 via-transparent to-transparent pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-500/3 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div id="top-bar" class="absolute top-0 left-0 right-0 h-14 px-10 flex items-center justify-between bg-gradient-to-b from-slate-800/60 to-transparent backdrop-blur-sm z-30">
+      <div class="flex items-center gap-8 text-slate-400">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-clock text-sm"></i>
+          <span class="text-sm font-medium">14:32</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-temperature-half text-sm"></i>
+          <span class="text-sm font-medium">22°C</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-6 text-slate-400">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-wifi text-sm"></i>
+          <span class="text-xs">5G</span>
+        </div>
+        <i class="fa-solid fa-signal text-sm"></i>
+        <div class="w-7 h-4 border border-slate-500 rounded-sm relative bg-slate-800/50">
+          <div class="absolute left-0.5 top-0.5 bottom-0.5 w-4/5 bg-green-400 rounded-sm"></div>
+          <div class="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-2 bg-slate-500 rounded-r-sm"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="main-display" class="absolute inset-0 pt-14 pb-20 flex items-center justify-center">
+      
+      <div id="acc-lane-view" class="relative w-[800px] h-[400px] bg-slate-900/40 rounded-3xl border border-slate-700/60 overflow-hidden backdrop-blur-sm">
+        
+        <div class="absolute top-4 left-6 flex items-center gap-3">
+          <div class="flex items-center gap-2 text-cyan-400">
+            <i class="fa-solid fa-road text-lg"></i>
+            <span class="text-sm font-semibold tracking-wide">ADAPTIVE CRUISE CONTROL</span>
+          </div>
+          <div class="px-3 py-1 bg-cyan-500/20 rounded-full border border-cyan-500/40 glow-cyan">
+            <span class="text-xs text-cyan-400 font-medium">ACTIVE</span>
+          </div>
+        </div>
+        
+        <div class="absolute top-4 right-6 flex items-center gap-4">
+          <div class="flex items-center gap-2 text-cyan-400">
+            <i class="fa-solid fa-shield-halved text-lg"></i>
+            <span class="text-xs font-medium">LKA ON</span>
+          </div>
+        </div>
+
+        <svg class="absolute inset-0 w-full h-full mt-16" viewBox="0 0 800 350" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="laneGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+            </linearGradient>
+          </defs>
+          
+          <path d="M 200 350 L 280 80" stroke="#475569" stroke-width="4" stroke-dasharray="30,20" fill="none" opacity="0.6"/>
+          <path d="M 600 350 L 520 80" stroke="#475569" stroke-width="4" stroke-dasharray="30,20" fill="none" opacity="0.6"/>
+          
+          <path d="M 320 350 L 360 80" stroke="#06b6d4" stroke-width="5" stroke-dasharray="25,15" fill="none" class="lane-pulse" opacity="0.9"/>
+          <path d="M 480 350 L 440 80" stroke="#06b6d4" stroke-width="5" stroke-dasharray="25,15" fill="none" class="lane-pulse" opacity="0.9"/>
+          
+          <path d="M 310 350 L 350 80" stroke="url(#laneGradient)" stroke-width="2" fill="none" opacity="0.6"/>
+          <path d="M 490 350 L 450 80" stroke="url(#laneGradient)" stroke-width="2" fill="none" opacity="0.6"/>
+        </svg>
+        
+        <div class="absolute top-32 left-1/2 transform -translate-x-1/2 lead-car-scale">
+          <div class="relative w-20 h-14 bg-slate-700 rounded-lg border-3 border-cyan-400 flex items-center justify-center glow-cyan">
+            <i class="fa-solid fa-car text-cyan-400 text-2xl"></i>
+            <div class="absolute -top-3 -left-3 w-2 h-2 bg-cyan-400 rounded-full glow-cyan acc-indicator"></div>
+            <div class="absolute -top-3 -right-3 w-2 h-2 bg-cyan-400 rounded-full glow-cyan acc-indicator" style="animation-delay: 0.5s;"></div>
+          </div>
+          
+          <div class="absolute top-16 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-1">
+            <div class="w-1 h-8 bg-gradient-to-b from-cyan-400 to-transparent rounded-full"></div>
+            <span class="text-sm text-cyan-400 font-medium">2.1s</span>
+            <span class="text-xs text-slate-400">Following</span>
+          </div>
+        </div>
+        
+        <div class="absolute left-20 top-1/2 transform -translate-y-1/2">
+          <div class="text-6xl font-light text-white">78</div>
+          <div class="text-lg text-slate-400 mt-1">Current</div>
+        </div>
+        
+        <div class="absolute right-20 top-1/2 transform -translate-y-1/2">
+          <div class="px-4 py-2 bg-blue-500/20 rounded-xl border border-blue-500/40 glow-blue">
+            <div class="text-4xl font-medium text-blue-400">80</div>
+            <div class="text-sm text-blue-300 mt-1">Set Speed</div>
+          </div>
+        </div>
+        
+        <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2">
+          <div class="relative w-16 h-20 bg-gradient-to-t from-slate-600 to-slate-700 rounded-lg border-2 border-white/80 flex items-center justify-center">
+            <i class="fa-solid fa-car text-white text-xl"></i>
+          </div>
+        </div>
+        
+        <div class="absolute bottom-20 left-16 w-4 h-16 bg-green-400/30 rounded-full glow-green"></div>
+        <div class="absolute bottom-20 right-16 w-4 h-16 bg-green-400/30 rounded-full glow-green"></div>
+        
+        <div class="absolute bottom-6 left-6 flex items-center gap-4 text-sm">
+          <div class="flex items-center gap-2 text-green-400">
+            <i class="fa-solid fa-check-circle text-xs"></i>
+            <span>Lane Detected</span>
+          </div>
+          <div class="flex items-center gap-2 text-cyan-400">
+            <i class="fa-solid fa-radar text-xs"></i>
+            <span>Target: 65m</span>
+          </div>
+        </div>
+        
+        <div class="absolute bottom-6 right-6 flex items-center gap-3">
+          <div class="w-3 h-3 bg-green-400 rounded-full glow-green"></div>
+          <span class="text-xs text-green-400 font-medium">All Sensors Active</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-bar" class="absolute bottom-0 left-0 right-0 h-20 px-10 flex items-center justify-between bg-gradient-to-t from-slate-900/90 to-transparent backdrop-blur-md z-30">
+      
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-1 px-6 py-3 bg-slate-800/60 rounded-xl border border-slate-700/60">
+          <span class="text-sm text-slate-500 px-2">P</span>
+          <span class="text-sm text-slate-500 px-2">R</span>
+          <span class="text-sm text-slate-500 px-2">N</span>
+          <span class="text-2xl text-white px-2 bg-cyan-500/20 rounded-lg border border-cyan-500/40">D</span>
+        </div>
+        
+        <div class="flex items-center gap-3 px-4 py-2 bg-slate-800/50 rounded-xl border border-slate-700/60">
+          <div class="relative">
+            <i class="fa-solid fa-battery-three-quarters text-green-400 text-xl"></i>
+            <div class="absolute inset-0 bg-green-400/20 rounded-lg blur-sm"></div>
+          </div>
+          <span class="text-lg text-white font-medium">64%</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-8 text-sm">
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-1">ACC MODE</span>
+          <span class="text-white font-medium">COMFORT</span>
+        </div>
+        
+        <div class="w-px h-10 bg-slate-700"></div>
+        
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-1">FOLLOWING</span>
+          <span class="text-white font-medium">NORMAL</span>
+        </div>
+        
+        <div class="w-px h-10 bg-slate-700"></div>
+        
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-1">RANGE</span>
+          <span class="text-white font-medium">278 km</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 px-4 py-2 bg-slate-800/50 rounded-xl border border-slate-700/60">
+          <i class="fa-brands fa-spotify text-green-400 text-lg"></i>
+          <div class="flex flex-col">
+            <span class="text-sm text-white font-medium">Highway Dreams</span>
+            <span class="text-xs text-slate-400">Chill Electronic</span>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3 text-slate-400">
+          <i class="fa-solid fa-phone text-lg"></i>
+          <i class="fa-solid fa-microphone text-lg"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</main>
+
+<script>
+window.addEventListener('load', function() {
+  setTimeout(() => {
+    const laneLines = document.querySelectorAll('.lane-pulse');
+    laneLines.forEach((line, index) => {
+      line.style.animationDelay = `${index * 0.3}s`;
+    });
+  }, 500);
+});
+</script>
+
+</body>
+</html>
